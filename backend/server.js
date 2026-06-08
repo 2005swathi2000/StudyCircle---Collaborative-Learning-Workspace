@@ -14,25 +14,41 @@ const discussionRoutes = require('./routes/discussions');
 const progressRoutes = require('./routes/progress');
 
 const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(',')
+  ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
   : ['http://localhost:3000', 'https://studycircle-collaborative-learning.vercel.app'];
+
+console.log('Allowed CORS Origins configured:', allowedOrigins);
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, or postman)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin matches allowed list, localhost, or any vercel.app subdomain
+    const isAllowed = allowedOrigins.includes(origin) || 
+                      origin.endsWith('.vercel.app') || 
+                      /^http:\/\/localhost(:\d+)?$/.test(origin);
+                      
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.warn(`Origin blocked by CORS: ${origin}`);
+      callback(null, false); // Disallow by returning false (doesn't set headers)
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
-  }
+  cors: corsOptions
 });
 
 // Middleware
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
-}));
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // API Routes
