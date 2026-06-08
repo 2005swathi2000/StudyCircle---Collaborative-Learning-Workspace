@@ -1,4 +1,9 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+let rawUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+// Auto-correct spelling typo (k117 -> k1l7) in Render subdomain
+if (rawUrl.includes('studycircle-backend-k117.onrender.com')) {
+  rawUrl = rawUrl.replace('studycircle-backend-k117.onrender.com', 'studycircle-backend-k1l7.onrender.com');
+}
+const BASE_URL = rawUrl;
 
 export const getAuthToken = (): string | null => {
   if (typeof window !== 'undefined') {
