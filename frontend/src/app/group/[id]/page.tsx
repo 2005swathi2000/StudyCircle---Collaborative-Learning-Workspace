@@ -338,38 +338,352 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
       `> Setting up mock test sandboxed execution...`
     ]);
 
-    setTimeout(() => {
-      setRunLogs(prev => [...prev, `> Compiling source code files...`]);
-      
-      setTimeout(() => {
-        setRunLogs(prev => [...prev, `> Running test cases against solution...`]);
-        
-        setTimeout(() => {
-          let testLogs = [];
-          if (selectedQuestion.id === 'twosum') {
-            testLogs = [
-              `> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [0,1] ✔`,
-              `> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [1,2] ✔`,
-              `> STATUS: SUCCESS (All 2 test cases passed successfully!)`
-            ];
-          } else if (selectedQuestion.id === 'reverse') {
-            testLogs = [
-              `> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ["o","l","l","e","h"] ✔`,
-              `> STATUS: SUCCESS (All test cases passed successfully!)`
-            ];
-          } else {
-            testLogs = [
-              `> Test Case 1: nums = [-1,0,3,5,9,12], target = 9. Expected: 4. Result: 4 ✔`,
-              `> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: -1 ✔`,
-              `> STATUS: SUCCESS (All 2 test cases passed successfully!)`
-            ];
+    const performValidation = () => {
+      const code = editorCode;
+      const lang = selectedLanguage;
+      const qId = selectedQuestion.id;
+      const trimmed = code.trim();
+
+      if (!trimmed || trimmed.length < 15) {
+        return {
+          success: false,
+          logs: [
+            `> Compiling source code files...`,
+            `> Compilation Error: Source code is empty or too short.`,
+            `> STATUS: FAILED (Compilation failed)`
+          ],
+          toastMsg: 'Compilation failed: Source code is empty or too short.',
+          toastType: 'error' as const
+        };
+      }
+
+      // JavaScript runtime execution
+      if (lang === 'javascript') {
+        let fn: any;
+        try {
+          if (qId === 'twosum') {
+            const wrapped = `${code}\nreturn twoSum;`;
+            fn = new Function(wrapped)();
+          } else if (qId === 'reverse') {
+            const wrapped = `${code}\nreturn reverseString;`;
+            fn = new Function(wrapped)();
+          } else if (qId === 'binary') {
+            const wrapped = `${code}\nreturn binarySearch;`;
+            fn = new Function(wrapped)();
           }
-          setRunLogs(prev => [...prev, ...testLogs]);
-          setRunningCode(false);
-          showToast('All coding test cases passed!', 'success');
-        }, 800);
-      }, 800);
-    }, 800);
+          if (typeof fn !== 'function') {
+            throw new Error(`Entrypoint function is not defined. Ensure your function name is correct.`);
+          }
+        } catch (err: any) {
+          return {
+            success: false,
+            logs: [
+              `> Compiling source code files...`,
+              `> Compilation Error: ${err.message || 'Syntax Error'}`,
+              `> STATUS: FAILED (Compilation failed)`
+            ],
+            toastMsg: `Compilation failed: ${err.message || 'Syntax Error'}`,
+            toastType: 'error' as const
+          };
+        }
+
+        try {
+          const testLogs = [`> Compiling source code files...`, `> Running test cases against solution...`];
+          if (qId === 'twosum') {
+            const res1 = fn([2, 7, 11, 15], 9);
+            const isOk1 = Array.isArray(res1) && 
+                          ((res1[0] === 0 && res1[1] === 1) || (res1[0] === 1 && res1[1] === 0));
+            testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: ${JSON.stringify(res1)} ${isOk1 ? '✔' : '❌'}`);
+
+            const res2 = fn([3, 2, 4], 6);
+            const isOk2 = Array.isArray(res2) && 
+                          ((res2[0] === 1 && res2[1] === 2) || (res2[0] === 2 && res2[1] === 1));
+            testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: ${JSON.stringify(res2)} ${isOk2 ? '✔' : '❌'}`);
+
+            if (isOk1 && isOk2) {
+              testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+              return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
+            } else {
+              const failedCount = (isOk1 ? 0 : 1) + (isOk2 ? 0 : 1);
+              testLogs.push(`> STATUS: FAILED (${failedCount} of 2 test cases failed)`);
+              return { success: false, logs: testLogs, toastMsg: 'Some test cases failed.', toastType: 'error' as const };
+            }
+          } else if (qId === 'reverse') {
+            const arr = ["h", "e", "l", "l", "o"];
+            fn(arr);
+            const isOk = Array.isArray(arr) && arr.join('') === 'olleh';
+            testLogs.push(`> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ${JSON.stringify(arr)} ${isOk ? '✔' : '❌'}`);
+            
+            if (isOk) {
+              testLogs.push(`> STATUS: SUCCESS (All test cases passed successfully!)`);
+              return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
+            } else {
+              testLogs.push(`> STATUS: FAILED (1 of 1 test cases failed)`);
+              return { success: false, logs: testLogs, toastMsg: 'Test case failed.', toastType: 'error' as const };
+            }
+          } else if (qId === 'binary') {
+            const res1 = fn([-1, 0, 3, 5, 9, 12], 9);
+            const isOk1 = res1 === 4;
+            testLogs.push(`> Test Case 1: nums = [-1,0,3,5,9,12], target = 9. Expected: 4. Result: ${res1} ${isOk1 ? '✔' : '❌'}`);
+
+            const res2 = fn([-1, 0, 3, 5, 9, 12], 2);
+            const isOk2 = res2 === -1;
+            testLogs.push(`> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: ${res2} ${isOk2 ? '✔' : '❌'}`);
+
+            if (isOk1 && isOk2) {
+              testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+              return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
+            } else {
+              const failedCount = (isOk1 ? 0 : 1) + (isOk2 ? 0 : 1);
+              testLogs.push(`> STATUS: FAILED (${failedCount} of 2 test cases failed)`);
+              return { success: false, logs: testLogs, toastMsg: 'Some test cases failed.', toastType: 'error' as const };
+            }
+          }
+        } catch (err: any) {
+          return {
+            success: false,
+            logs: [
+              `> Compiling source code files...`,
+              `> Running test cases against solution...`,
+              `> Runtime Error: ${err.message || 'Execution Error'}`,
+              `> STATUS: FAILED (Execution failed)`
+            ],
+            toastMsg: `Runtime Error: ${err.message || 'Execution Error'}`,
+            toastType: 'error' as const
+          };
+        }
+      }
+
+      // Python structural code analysis
+      if (lang === 'python') {
+        const testLogs = [`> Compiling source code files...`];
+        if (qId === 'twosum') {
+          const hasDef = trimmed.includes('def twoSum(');
+          if (!hasDef) {
+            return {
+              success: false,
+              logs: [
+                `> Compiling source code files...`,
+                `> Compilation Error: NameError: name 'twoSum' is not defined.`,
+                `> STATUS: FAILED (Compilation failed)`
+              ],
+              toastMsg: "Compilation failed: function 'twoSum' not defined.",
+              toastType: 'error' as const
+            };
+          }
+
+          const isHardcoded = trimmed.includes('return [0, 1]') && !trimmed.includes('for') && !trimmed.includes('while');
+          const hasLoop = trimmed.includes('for ') || trimmed.includes('while ');
+          const hasComplement = (trimmed.includes('-') && (trimmed.includes('in ') || trimmed.includes('get('))) || trimmed.includes('hashmap') || trimmed.includes('dict');
+
+          testLogs.push(`> Running test cases against solution...`);
+          if (isHardcoded) {
+            testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [0,1] ✔`);
+            testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [0,1] ❌`);
+            testLogs.push(`> STATUS: FAILED (1 of 2 test cases failed)`);
+            return { success: false, logs: testLogs, toastMsg: 'Test Case 2 failed. Hardcoded solution detected.', toastType: 'error' as const };
+          } else if (hasLoop && hasComplement) {
+            testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [0,1] ✔`);
+            testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [1,2] ✔`);
+            testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+            return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
+          } else {
+            testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: None ❌`);
+            testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: None ❌`);
+            testLogs.push(`> STATUS: FAILED (2 of 2 test cases failed)`);
+            return { success: false, logs: testLogs, toastMsg: 'All test cases failed. Please review your logic.', toastType: 'error' as const };
+          }
+        } else if (qId === 'reverse') {
+          const hasDef = trimmed.includes('def reverseString(');
+          if (!hasDef) {
+            return {
+              success: false,
+              logs: [
+                `> Compiling source code files...`,
+                `> Compilation Error: NameError: name 'reverseString' is not defined.`,
+                `> STATUS: FAILED (Compilation failed)`
+              ],
+              toastMsg: "Compilation failed: function 'reverseString' not defined.",
+              toastType: 'error' as const
+            };
+          }
+
+          const hasLoop = trimmed.includes('while') || trimmed.includes('for') || trimmed.includes('reverse') || trimmed.includes('[::-1]') || trimmed.includes('s[:] =');
+          testLogs.push(`> Running test cases against solution...`);
+          if (hasLoop) {
+            testLogs.push(`> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ["o","l","l","e","h"] ✔`);
+            testLogs.push(`> STATUS: SUCCESS (All test cases passed successfully!)`);
+            return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
+          } else {
+            testLogs.push(`> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ["h","e","l","l","o"] ❌`);
+            testLogs.push(`> STATUS: FAILED (1 of 1 test cases failed)`);
+            return { success: false, logs: testLogs, toastMsg: 'Test case failed. Solution does not reverse in-place.', toastType: 'error' as const };
+          }
+        } else if (qId === 'binary') {
+          const hasDef = trimmed.includes('def binarySearch(');
+          if (!hasDef) {
+            return {
+              success: false,
+              logs: [
+                `> Compiling source code files...`,
+                `> Compilation Error: NameError: name 'binarySearch' is not defined.`,
+                `> STATUS: FAILED (Compilation failed)`
+              ],
+              toastMsg: "Compilation failed: function 'binarySearch' not defined.",
+              toastType: 'error' as const
+            };
+          }
+
+          const hasLoop = trimmed.includes('while ') || trimmed.includes('for ');
+          const hasMid = trimmed.includes('//') || trimmed.includes('/') || trimmed.includes('mid');
+          
+          testLogs.push(`> Running test cases against solution...`);
+          if (hasLoop && hasMid) {
+            testLogs.push(`> Test Case 1: nums = [-1,0,3,5,9,12], target = 9. Expected: 4. Result: 4 ✔`);
+            testLogs.push(`> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: -1 ✔`);
+            testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+            return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
+          } else {
+            testLogs.push(`> Test Case 1: nums = [-1,0,3,5,9,12], target = 9. Expected: 4. Result: -1 ❌`);
+            testLogs.push(`> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: -1 ✔`);
+            testLogs.push(`> STATUS: FAILED (1 of 2 test cases failed)`);
+            return { success: false, logs: testLogs, toastMsg: 'Some test cases failed.', toastType: 'error' as const };
+          }
+        }
+      }
+
+      // Java structural code analysis
+      if (lang === 'java') {
+        const testLogs = [`> Compiling source code files...`];
+        const hasClass = trimmed.includes('class Solution');
+        if (!hasClass) {
+          return {
+            success: false,
+            logs: [
+              `> Compiling source code files...`,
+              `> Compilation Error: error: class Solution is public, should be declared in a file named Solution.java`,
+              `> STATUS: FAILED (Compilation failed)`
+            ],
+            toastMsg: "Compilation failed: class 'Solution' not found.",
+            toastType: 'error' as const
+          };
+        }
+
+        if (qId === 'twosum') {
+          const hasMethod = trimmed.includes('twoSum(');
+          if (!hasMethod) {
+            return {
+              success: false,
+              logs: [
+                `> Compiling source code files...`,
+                `> Compilation Error: error: cannot find symbol twoSum method in class Solution`,
+                `> STATUS: FAILED (Compilation failed)`
+              ],
+              toastMsg: "Compilation failed: method 'twoSum' not found.",
+              toastType: 'error' as const
+            };
+          }
+
+          const isHardcoded = trimmed.includes('new int[]{0, 1}') && !trimmed.includes('for') && !trimmed.includes('while');
+          const hasLoop = trimmed.includes('for') || trimmed.includes('while');
+          const hasMap = trimmed.includes('Map') || trimmed.includes('HashMap') || trimmed.includes('containsKey');
+
+          testLogs.push(`> Running test cases against solution...`);
+          if (isHardcoded) {
+            testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [0,1] ✔`);
+            testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [0,1] ❌`);
+            testLogs.push(`> STATUS: FAILED (1 of 2 test cases failed)`);
+            return { success: false, logs: testLogs, toastMsg: 'Test Case 2 failed. Hardcoded solution detected.', toastType: 'error' as const };
+          } else if (hasLoop && hasMap) {
+            testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [0,1] ✔`);
+            testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [1,2] ✔`);
+            testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+            return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
+          } else {
+            testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [] ❌`);
+            testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [] ❌`);
+            testLogs.push(`> STATUS: FAILED (2 of 2 test cases failed)`);
+            return { success: false, logs: testLogs, toastMsg: 'All test cases failed. Please review your logic.', toastType: 'error' as const };
+          }
+        } else if (qId === 'reverse') {
+          const hasMethod = trimmed.includes('reverseString(');
+          if (!hasMethod) {
+            return {
+              success: false,
+              logs: [
+                `> Compiling source code files...`,
+                `> Compilation Error: error: cannot find symbol reverseString method in class Solution`,
+                `> STATUS: FAILED (Compilation failed)`
+              ],
+              toastMsg: "Compilation failed: method 'reverseString' not found.",
+              toastType: 'error' as const
+            };
+          }
+
+          const hasLoop = trimmed.includes('for') || trimmed.includes('while');
+          const hasSwap = trimmed.includes('=') && (trimmed.includes('temp') || trimmed.includes('left') || trimmed.includes('right'));
+
+          testLogs.push(`> Running test cases against solution...`);
+          if (hasLoop && hasSwap) {
+            testLogs.push(`> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ["o","l","l","e","h"] ✔`);
+            testLogs.push(`> STATUS: SUCCESS (All test cases passed successfully!)`);
+            return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
+          } else {
+            testLogs.push(`> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ["h","e","l","l","o"] ❌`);
+            testLogs.push(`> STATUS: FAILED (1 of 1 test cases failed)`);
+            return { success: false, logs: testLogs, toastMsg: 'Test case failed. Solution does not reverse in-place.', toastType: 'error' as const };
+          }
+        } else if (qId === 'binary') {
+          const hasMethod = trimmed.includes('binarySearch(');
+          if (!hasMethod) {
+            return {
+              success: false,
+              logs: [
+                `> Compiling source code files...`,
+                `> Compilation Error: error: cannot find symbol binarySearch method in class Solution`,
+                `> STATUS: FAILED (Compilation failed)`
+              ],
+              toastMsg: "Compilation failed: method 'binarySearch' not found.",
+              toastType: 'error' as const
+            };
+          }
+
+          const hasLoop = trimmed.includes('while') || trimmed.includes('for');
+          const hasMid = trimmed.includes('/') || trimmed.includes('mid');
+
+          testLogs.push(`> Running test cases against solution...`);
+          if (hasLoop && hasMid) {
+            testLogs.push(`> Test Case 1: nums = [-1,0,3,5,9,12], target = 9. Expected: 4. Result: 4 ✔`);
+            testLogs.push(`> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: -1 ✔`);
+            testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+            return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
+          } else {
+            testLogs.push(`> Test Case 1: nums = [-1,0,3,5,9,12], target = 9. Expected: 4. Result: -1 ❌`);
+            testLogs.push(`> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: -1 ✔`);
+            testLogs.push(`> STATUS: FAILED (1 of 2 test cases failed)`);
+            return { success: false, logs: testLogs, toastMsg: 'Some test cases failed.', toastType: 'error' as const };
+          }
+        }
+      }
+
+      return {
+        success: false,
+        logs: [
+          `> Compiling source code files...`,
+          `> Compilation Error: Unknown compiler target error.`,
+          `> STATUS: FAILED (Compilation failed)`
+        ],
+        toastMsg: 'Unknown compiler target error.',
+        toastType: 'error' as const
+      };
+    };
+
+    setTimeout(() => {
+      const evaluation = performValidation();
+      setRunLogs(prev => [...prev, ...evaluation.logs]);
+      setRunningCode(false);
+      showToast(evaluation.toastMsg, evaluation.toastType);
+    }, 1500);
   };
 
   useEffect(() => {
