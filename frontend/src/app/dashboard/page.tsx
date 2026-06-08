@@ -235,12 +235,13 @@ export default function DashboardPage() {
               <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 border border-violet-500/30 flex items-center justify-center text-violet-400 font-bold text-lg uppercase shrink-0">
                 {cleanName.substring(0, 2)}
               </div>
-              <div className="min-w-0">
-                <h3 className="font-bold text-lg text-zinc-100 truncate">{cleanName}</h3>
-                <p className="text-sm text-zinc-500">@{user?.username}</p>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-bold text-lg text-zinc-100 truncate" title={cleanName}>{cleanName}</h3>
+                <p className="text-sm text-zinc-500 truncate" title={user?.username}>@{user?.username}</p>
                 {college && (
-                  <div className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 rounded-full bg-violet-950/40 border border-violet-900/50 text-[10px] font-semibold text-violet-300 uppercase tracking-wider">
-                    <GraduationCap className="h-3 w-3 shrink-0" /> {college}
+                  <div className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 rounded-full bg-violet-950/40 border border-violet-900/50 text-[10px] font-semibold text-violet-300 uppercase tracking-wider max-w-full">
+                    <GraduationCap className="h-3 w-3 shrink-0" /> 
+                    <span className="truncate" title={college}>{college}</span>
                   </div>
                 )}
               </div>

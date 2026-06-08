@@ -2151,11 +2151,11 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
                             <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-violet-600/15 to-indigo-600/15 border border-violet-500/20 flex items-center justify-center text-xs font-bold text-violet-300 uppercase shrink-0">
                               {mName.substring(0, 2)}
                             </div>
-                            <div className="min-w-0">
-                              <h4 className="font-bold text-sm text-zinc-200 truncate leading-snug">{mName}</h4>
-                              <p className="text-[10px] text-zinc-500">@{memberObj.User?.username}</p>
+                            <div className="min-w-0 flex-1">
+                              <h4 className="font-bold text-sm text-zinc-200 truncate leading-snug" title={mName}>{mName}</h4>
+                              <p className="text-[10px] text-zinc-500 truncate" title={memberObj.User?.username}>@{memberObj.User?.username}</p>
                               {mCollege && (
-                                <span className="inline-block text-[9px] text-violet-400 font-bold uppercase mt-1">{mCollege}</span>
+                                <span className="inline-block text-[9px] text-violet-400 font-bold uppercase mt-1 truncate max-w-full" title={mCollege}>{mCollege}</span>
                               )}
                             </div>
                           </div>
