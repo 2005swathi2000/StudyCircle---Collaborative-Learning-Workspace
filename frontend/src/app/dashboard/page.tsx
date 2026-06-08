@@ -193,7 +193,7 @@ export default function DashboardPage() {
   const isAdminDemo = user?.username === 'admin.demo@studycircle.com';
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans relative overflow-x-hidden pb-12">
+    <div className="min-h-screen bg-zinc-955 text-zinc-100 font-sans relative overflow-x-hidden pb-12 theme-dashboard">
       {/* Background gradients */}
       <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[50%] rounded-full bg-violet-600/5 blur-[120px]" />
       <div className="absolute top-[20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-600/5 blur-[120px]" />
@@ -838,7 +838,7 @@ export default function DashboardPage() {
 
       {/* CREATE GROUP MODAL */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn theme-create-modal">
           <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl relative space-y-5">
             <div>
               <h3 className="text-xl font-bold text-zinc-100">Create Study Circle</h3>

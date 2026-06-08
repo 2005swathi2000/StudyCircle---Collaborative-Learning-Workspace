@@ -1053,7 +1053,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col relative overflow-hidden theme-workspace">
       
       {/* Glow decorative items */}
       <div className="absolute top-[-30%] left-[20%] w-[60%] h-[60%] rounded-full bg-violet-600/5 blur-[140px] pointer-events-none" />

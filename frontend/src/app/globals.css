@@ -3,6 +3,69 @@
 :root {
   --background: #020617;
   --foreground: #f8fafc;
+
+  /* Theme variables default (Landing/Login): True Violet & Indigo */
+  --accent-violet-950: #0f0b26;
+  --accent-violet-900: #1a0f3d;
+  --accent-violet-600: #8b5cf6; /* True Violet */
+  --accent-violet-500: #a78bfa;
+  --accent-violet-400: #c4b5fd;
+  --accent-violet-300: #ddd6fe;
+  
+  --accent-indigo-955: #020617;
+  --accent-indigo-950: #020617;
+  --accent-indigo-900: #0B0F19;
+  --accent-indigo-650: #94A3B8;
+  --accent-indigo-600: #4f46e5; /* Indigo */
+  --accent-indigo-500: #6366f1;
+}
+
+/* Dashboard Theme: Emerald & Teal (Green Accent) */
+.theme-dashboard {
+  --accent-violet-950: #022c22; /* Emerald 950 */
+  --accent-violet-900: #064e3b; /* Emerald 900 */
+  --accent-violet-600: #10b981; /* Emerald 600 */
+  --accent-violet-500: #059669; /* Emerald 500 */
+  --accent-violet-400: #34d399; /* Emerald 400 */
+  --accent-violet-300: #6ee7b7; /* Emerald 300 */
+  
+  --accent-indigo-955: #042f2e; /* Teal 950 */
+  --accent-indigo-950: #042f2e; /* Teal 950 */
+  --accent-indigo-900: #115e59; /* Teal 900 */
+  --accent-indigo-600: #0d9488; /* Teal 600 */
+  --accent-indigo-500: #14b8a6; /* Teal 500 */
+}
+
+/* Create Study Modal Theme: Amber & Orange */
+.theme-create-modal {
+  --accent-violet-950: #451a03; /* Amber 950 */
+  --accent-violet-900: #78350f; /* Amber 900 */
+  --accent-violet-600: #d97706; /* Amber 600 */
+  --accent-violet-500: #f59e0b; /* Amber 500 */
+  --accent-violet-400: #fbbf24; /* Amber 400 */
+  --accent-violet-300: #fcd34d; /* Amber 300 */
+  
+  --accent-indigo-955: #431407; /* Orange 950 */
+  --accent-indigo-950: #431407; /* Orange 950 */
+  --accent-indigo-900: #7c2d12; /* Orange 900 */
+  --accent-indigo-600: #ea580c; /* Orange 600 */
+  --accent-indigo-500: #f97316; /* Orange 500 */
+}
+
+/* Workspace Theme: Sapphire Blue & Cyan */
+.theme-workspace {
+  --accent-violet-950: #091e3a; /* Deep Sapphire */
+  --accent-violet-900: #0f3057; /* Sapphire 900 */
+  --accent-violet-600: #2563eb; /* Electric Blue */
+  --accent-violet-500: #3b82f6;
+  --accent-violet-400: #22d3ee; /* Cyan Accent */
+  --accent-violet-300: #67e8f9;
+  
+  --accent-indigo-955: #020617;
+  --accent-indigo-950: #091e3a;
+  --accent-indigo-900: #1d4ed8; /* Royal Blue */
+  --accent-indigo-600: #1d4ed8;
+  --accent-indigo-500: #3b82f6;
 }
 
 @theme inline {
@@ -36,25 +99,25 @@
   --color-zinc-100: #FFFFFF;
   --color-zinc-50: #FFFFFF;
   
-  /* Redefine primary/secondary branding gradients to Electric Blue, Indigo and Cyan */
-  --color-violet-950: #020617;
-  --color-violet-900: #0B0F19;
-  --color-violet-600: #2563EB; /* Electric Blue */
-  --color-violet-500: #3B82F6;
-  --color-violet-400: #22D3EE; /* Cyan Accent text */
-  --color-violet-300: #22D3EE;
+  /* Redefine primary/secondary branding gradients to use dynamic CSS variables */
+  --color-violet-950: var(--accent-violet-950);
+  --color-violet-900: var(--accent-violet-900);
+  --color-violet-600: var(--accent-violet-600);
+  --color-violet-500: var(--accent-violet-500);
+  --color-violet-400: var(--accent-violet-400);
+  --color-violet-300: var(--accent-violet-300);
   --color-violet-200: #E2E8F0;
   --color-violet-100: #FFFFFF;
   
-  --color-indigo-955: #020617;
-  --color-indigo-950: #020617;
-  --color-indigo-900: #0B0F19;
-  --color-indigo-650: #94A3B8;
-  --color-indigo-600: #4F46E5; /* Indigo secondary */
-  --color-indigo-500: #6366F1;
-  --color-indigo-400: #4F46E5;
-  --color-indigo-300: #4338CA;
-  --color-indigo-200: #3730A3;
+  --color-indigo-955: var(--accent-indigo-955);
+  --color-indigo-950: var(--accent-indigo-950);
+  --color-indigo-900: var(--accent-indigo-900);
+  --color-indigo-650: var(--accent-indigo-650);
+  --color-indigo-600: var(--accent-indigo-600);
+  --color-indigo-500: var(--accent-indigo-500);
+  --color-indigo-400: var(--accent-indigo-600);
+  --color-indigo-300: var(--accent-indigo-900);
+  --color-indigo-200: var(--accent-indigo-950);
   --color-indigo-100: #1E1B4B;
   
   /* Success & Accent */
