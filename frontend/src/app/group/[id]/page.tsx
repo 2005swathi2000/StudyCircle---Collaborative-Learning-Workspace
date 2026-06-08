@@ -334,8 +334,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
     if (!selectedQuestion) return;
     setRunningCode(true);
     setRunLogs([
-      `> Initiating compiler backend for ${selectedLanguage.toUpperCase()}...`,
-      `> Setting up mock test sandboxed execution...`
+      `> Running code...`
     ]);
 
     const performValidation = () => {
@@ -348,9 +347,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
         return {
           success: false,
           logs: [
-            `> Compiling source code files...`,
-            `> Compilation Error: Source code is empty or too short.`,
-            `> STATUS: FAILED (Compilation failed)`
+            `> Failed (Source code is empty or too short)`
           ],
           toastMsg: 'Compilation failed: Source code is empty or too short.',
           toastType: 'error' as const
@@ -378,9 +375,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
           return {
             success: false,
             logs: [
-              `> Compiling source code files...`,
-              `> Compilation Error: ${err.message || 'Syntax Error'}`,
-              `> STATUS: FAILED (Compilation failed)`
+              `> Failed (Compilation Error: ${err.message || 'Syntax Error'})`
             ],
             toastMsg: `Compilation failed: ${err.message || 'Syntax Error'}`,
             toastType: 'error' as const
@@ -388,7 +383,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
         }
 
         try {
-          const testLogs = [`> Compiling source code files...`, `> Running test cases against solution...`];
+          const testLogs = [`> Sample test cases:`];
           if (qId === 'twosum') {
             const res1 = fn([2, 7, 11, 15], 9);
             const isOk1 = Array.isArray(res1) && 
@@ -398,14 +393,14 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
             const res2 = fn([3, 2, 4], 6);
             const isOk2 = Array.isArray(res2) && 
                           ((res2[0] === 1 && res2[1] === 2) || (res2[0] === 2 && res2[1] === 1));
-            testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: ${JSON.stringify(res2)} ${isOk2 ? '✔' : '❌'}`);
+            testLogs.push(`> Test Case 2: nums = [3, 2, 4], target = 6. Expected: [1,2]. Result: ${JSON.stringify(res2)} ${isOk2 ? '✔' : '❌'}`);
 
             if (isOk1 && isOk2) {
-              testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+              testLogs.push(`> Compiled successfully!`);
               return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
             } else {
               const failedCount = (isOk1 ? 0 : 1) + (isOk2 ? 0 : 1);
-              testLogs.push(`> STATUS: FAILED (${failedCount} of 2 test cases failed)`);
+              testLogs.push(`> Failed (${failedCount} of 2 test cases failed)`);
               return { success: false, logs: testLogs, toastMsg: 'Some test cases failed.', toastType: 'error' as const };
             }
           } else if (qId === 'reverse') {
@@ -415,10 +410,10 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
             testLogs.push(`> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ${JSON.stringify(arr)} ${isOk ? '✔' : '❌'}`);
             
             if (isOk) {
-              testLogs.push(`> STATUS: SUCCESS (All test cases passed successfully!)`);
+              testLogs.push(`> Compiled successfully!`);
               return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
             } else {
-              testLogs.push(`> STATUS: FAILED (1 of 1 test cases failed)`);
+              testLogs.push(`> Failed (1 of 1 test cases failed)`);
               return { success: false, logs: testLogs, toastMsg: 'Test case failed.', toastType: 'error' as const };
             }
           } else if (qId === 'binary') {
@@ -431,11 +426,11 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
             testLogs.push(`> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: ${res2} ${isOk2 ? '✔' : '❌'}`);
 
             if (isOk1 && isOk2) {
-              testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+              testLogs.push(`> Compiled successfully!`);
               return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
             } else {
               const failedCount = (isOk1 ? 0 : 1) + (isOk2 ? 0 : 1);
-              testLogs.push(`> STATUS: FAILED (${failedCount} of 2 test cases failed)`);
+              testLogs.push(`> Failed (${failedCount} of 2 test cases failed)`);
               return { success: false, logs: testLogs, toastMsg: 'Some test cases failed.', toastType: 'error' as const };
             }
           }
@@ -443,10 +438,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
           return {
             success: false,
             logs: [
-              `> Compiling source code files...`,
-              `> Running test cases against solution...`,
-              `> Runtime Error: ${err.message || 'Execution Error'}`,
-              `> STATUS: FAILED (Execution failed)`
+              `> Failed (Runtime Error: ${err.message || 'Execution Error'})`
             ],
             toastMsg: `Runtime Error: ${err.message || 'Execution Error'}`,
             toastType: 'error' as const
@@ -456,16 +448,14 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
 
       // Python structural code analysis
       if (lang === 'python') {
-        const testLogs = [`> Compiling source code files...`];
+        const testLogs = [`> Sample test cases:`];
         if (qId === 'twosum') {
           const hasDef = trimmed.includes('def twoSum(');
           if (!hasDef) {
             return {
               success: false,
               logs: [
-                `> Compiling source code files...`,
-                `> Compilation Error: NameError: name 'twoSum' is not defined.`,
-                `> STATUS: FAILED (Compilation failed)`
+                `> Failed (Compilation Error: NameError: name 'twoSum' is not defined.)`
               ],
               toastMsg: "Compilation failed: function 'twoSum' not defined.",
               toastType: 'error' as const
@@ -476,21 +466,20 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
           const hasLoop = trimmed.includes('for ') || trimmed.includes('while ');
           const hasComplement = (trimmed.includes('-') && (trimmed.includes('in ') || trimmed.includes('get('))) || trimmed.includes('hashmap') || trimmed.includes('dict');
 
-          testLogs.push(`> Running test cases against solution...`);
           if (isHardcoded) {
             testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [0,1] ✔`);
             testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [0,1] ❌`);
-            testLogs.push(`> STATUS: FAILED (1 of 2 test cases failed)`);
+            testLogs.push(`> Failed (1 of 2 test cases failed)`);
             return { success: false, logs: testLogs, toastMsg: 'Test Case 2 failed. Hardcoded solution detected.', toastType: 'error' as const };
           } else if (hasLoop && hasComplement) {
             testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [0,1] ✔`);
             testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [1,2] ✔`);
-            testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+            testLogs.push(`> Compiled successfully!`);
             return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
           } else {
             testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: None ❌`);
             testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: None ❌`);
-            testLogs.push(`> STATUS: FAILED (2 of 2 test cases failed)`);
+            testLogs.push(`> Failed (2 of 2 test cases failed)`);
             return { success: false, logs: testLogs, toastMsg: 'All test cases failed. Please review your logic.', toastType: 'error' as const };
           }
         } else if (qId === 'reverse') {
@@ -499,9 +488,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
             return {
               success: false,
               logs: [
-                `> Compiling source code files...`,
-                `> Compilation Error: NameError: name 'reverseString' is not defined.`,
-                `> STATUS: FAILED (Compilation failed)`
+                `> Failed (Compilation Error: NameError: name 'reverseString' is not defined.)`
               ],
               toastMsg: "Compilation failed: function 'reverseString' not defined.",
               toastType: 'error' as const
@@ -509,14 +496,13 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
           }
 
           const hasLoop = trimmed.includes('while') || trimmed.includes('for') || trimmed.includes('reverse') || trimmed.includes('[::-1]') || trimmed.includes('s[:] =');
-          testLogs.push(`> Running test cases against solution...`);
           if (hasLoop) {
             testLogs.push(`> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ["o","l","l","e","h"] ✔`);
-            testLogs.push(`> STATUS: SUCCESS (All test cases passed successfully!)`);
+            testLogs.push(`> Compiled successfully!`);
             return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
           } else {
             testLogs.push(`> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ["h","e","l","l","o"] ❌`);
-            testLogs.push(`> STATUS: FAILED (1 of 1 test cases failed)`);
+            testLogs.push(`> Failed (1 of 1 test cases failed)`);
             return { success: false, logs: testLogs, toastMsg: 'Test case failed. Solution does not reverse in-place.', toastType: 'error' as const };
           }
         } else if (qId === 'binary') {
@@ -525,9 +511,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
             return {
               success: false,
               logs: [
-                `> Compiling source code files...`,
-                `> Compilation Error: NameError: name 'binarySearch' is not defined.`,
-                `> STATUS: FAILED (Compilation failed)`
+                `> Failed (Compilation Error: NameError: name 'binarySearch' is not defined.)`
               ],
               toastMsg: "Compilation failed: function 'binarySearch' not defined.",
               toastType: 'error' as const
@@ -537,16 +521,15 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
           const hasLoop = trimmed.includes('while ') || trimmed.includes('for ');
           const hasMid = trimmed.includes('//') || trimmed.includes('/') || trimmed.includes('mid');
           
-          testLogs.push(`> Running test cases against solution...`);
           if (hasLoop && hasMid) {
             testLogs.push(`> Test Case 1: nums = [-1,0,3,5,9,12], target = 9. Expected: 4. Result: 4 ✔`);
             testLogs.push(`> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: -1 ✔`);
-            testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+            testLogs.push(`> Compiled successfully!`);
             return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
           } else {
             testLogs.push(`> Test Case 1: nums = [-1,0,3,5,9,12], target = 9. Expected: 4. Result: -1 ❌`);
             testLogs.push(`> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: -1 ✔`);
-            testLogs.push(`> STATUS: FAILED (1 of 2 test cases failed)`);
+            testLogs.push(`> Failed (1 of 2 test cases failed)`);
             return { success: false, logs: testLogs, toastMsg: 'Some test cases failed.', toastType: 'error' as const };
           }
         }
@@ -554,15 +537,13 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
 
       // Java structural code analysis
       if (lang === 'java') {
-        const testLogs = [`> Compiling source code files...`];
+        const testLogs = [`> Sample test cases:`];
         const hasClass = trimmed.includes('class Solution');
         if (!hasClass) {
           return {
             success: false,
             logs: [
-              `> Compiling source code files...`,
-              `> Compilation Error: error: class Solution is public, should be declared in a file named Solution.java`,
-              `> STATUS: FAILED (Compilation failed)`
+              `> Failed (Compilation Error: class Solution is public, should be declared in a file named Solution.java)`
             ],
             toastMsg: "Compilation failed: class 'Solution' not found.",
             toastType: 'error' as const
@@ -575,9 +556,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
             return {
               success: false,
               logs: [
-                `> Compiling source code files...`,
-                `> Compilation Error: error: cannot find symbol twoSum method in class Solution`,
-                `> STATUS: FAILED (Compilation failed)`
+                `> Failed (Compilation Error: cannot find symbol twoSum method in class Solution)`
               ],
               toastMsg: "Compilation failed: method 'twoSum' not found.",
               toastType: 'error' as const
@@ -588,21 +567,20 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
           const hasLoop = trimmed.includes('for') || trimmed.includes('while');
           const hasMap = trimmed.includes('Map') || trimmed.includes('HashMap') || trimmed.includes('containsKey');
 
-          testLogs.push(`> Running test cases against solution...`);
           if (isHardcoded) {
             testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [0,1] ✔`);
             testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [0,1] ❌`);
-            testLogs.push(`> STATUS: FAILED (1 of 2 test cases failed)`);
+            testLogs.push(`> Failed (1 of 2 test cases failed)`);
             return { success: false, logs: testLogs, toastMsg: 'Test Case 2 failed. Hardcoded solution detected.', toastType: 'error' as const };
           } else if (hasLoop && hasMap) {
             testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [0,1] ✔`);
             testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [1,2] ✔`);
-            testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+            testLogs.push(`> Compiled successfully!`);
             return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
           } else {
             testLogs.push(`> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [] ❌`);
             testLogs.push(`> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [] ❌`);
-            testLogs.push(`> STATUS: FAILED (2 of 2 test cases failed)`);
+            testLogs.push(`> Failed (2 of 2 test cases failed)`);
             return { success: false, logs: testLogs, toastMsg: 'All test cases failed. Please review your logic.', toastType: 'error' as const };
           }
         } else if (qId === 'reverse') {
@@ -611,9 +589,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
             return {
               success: false,
               logs: [
-                `> Compiling source code files...`,
-                `> Compilation Error: error: cannot find symbol reverseString method in class Solution`,
-                `> STATUS: FAILED (Compilation failed)`
+                `> Failed (Compilation Error: cannot find symbol reverseString method in class Solution)`
               ],
               toastMsg: "Compilation failed: method 'reverseString' not found.",
               toastType: 'error' as const
@@ -621,16 +597,15 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
           }
 
           const hasLoop = trimmed.includes('for') || trimmed.includes('while');
-          const hasSwap = trimmed.includes('=') && (trimmed.includes('temp') || trimmed.includes('left') || trimmed.includes('right'));
+          const hoverSwap = trimmed.includes('=') && (trimmed.includes('temp') || trimmed.includes('left') || trimmed.includes('right'));
 
-          testLogs.push(`> Running test cases against solution...`);
-          if (hasLoop && hasSwap) {
+          if (hasLoop && hoverSwap) {
             testLogs.push(`> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ["o","l","l","e","h"] ✔`);
-            testLogs.push(`> STATUS: SUCCESS (All test cases passed successfully!)`);
+            testLogs.push(`> Compiled successfully!`);
             return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
           } else {
             testLogs.push(`> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ["h","e","l","l","o"] ❌`);
-            testLogs.push(`> STATUS: FAILED (1 of 1 test cases failed)`);
+            testLogs.push(`> Failed (1 of 1 test cases failed)`);
             return { success: false, logs: testLogs, toastMsg: 'Test case failed. Solution does not reverse in-place.', toastType: 'error' as const };
           }
         } else if (qId === 'binary') {
@@ -639,9 +614,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
             return {
               success: false,
               logs: [
-                `> Compiling source code files...`,
-                `> Compilation Error: error: cannot find symbol binarySearch method in class Solution`,
-                `> STATUS: FAILED (Compilation failed)`
+                `> Failed (Compilation Error: cannot find symbol binarySearch method in class Solution)`
               ],
               toastMsg: "Compilation failed: method 'binarySearch' not found.",
               toastType: 'error' as const
@@ -651,16 +624,15 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
           const hasLoop = trimmed.includes('while') || trimmed.includes('for');
           const hasMid = trimmed.includes('/') || trimmed.includes('mid');
 
-          testLogs.push(`> Running test cases against solution...`);
           if (hasLoop && hasMid) {
             testLogs.push(`> Test Case 1: nums = [-1,0,3,5,9,12], target = 9. Expected: 4. Result: 4 ✔`);
             testLogs.push(`> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: -1 ✔`);
-            testLogs.push(`> STATUS: SUCCESS (All 2 test cases passed successfully!)`);
+            testLogs.push(`> Compiled successfully!`);
             return { success: true, logs: testLogs, toastMsg: 'All coding test cases passed!', toastType: 'success' as const };
           } else {
             testLogs.push(`> Test Case 1: nums = [-1,0,3,5,9,12], target = 9. Expected: 4. Result: -1 ❌`);
             testLogs.push(`> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: -1 ✔`);
-            testLogs.push(`> STATUS: FAILED (1 of 2 test cases failed)`);
+            testLogs.push(`> Failed (1 of 2 test cases failed)`);
             return { success: false, logs: testLogs, toastMsg: 'Some test cases failed.', toastType: 'error' as const };
           }
         }
@@ -669,9 +641,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
       return {
         success: false,
         logs: [
-          `> Compiling source code files...`,
-          `> Compilation Error: Unknown compiler target error.`,
-          `> STATUS: FAILED (Compilation failed)`
+          `> Failed (Compilation Error: Unknown compiler target error.)`
         ],
         toastMsg: 'Unknown compiler target error.',
         toastType: 'error' as const
@@ -1496,8 +1466,9 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
                                 ) : (
                                   runLogs.map((log, index) => {
                                     let color = 'text-zinc-400';
-                                    if (log.includes('✔') || log.includes('SUCCESS')) color = 'text-emerald-400 font-bold';
-                                    else if (log.includes('Initiating') || log.includes('Running')) color = 'text-violet-400';
+                                    if (log.includes('✔') || log.includes('SUCCESS') || log.includes('successfully') || log.includes('Successful')) color = 'text-emerald-400 font-bold';
+                                    else if (log.includes('Failed') || log.includes('FAILED') || log.includes('Error') || log.includes('❌')) color = 'text-rose-400 font-bold';
+                                    else if (log.includes('Running') || log.includes('Running code')) color = 'text-violet-400';
                                     return (
                                       <div key={index} className={color}>
                                         {log}
