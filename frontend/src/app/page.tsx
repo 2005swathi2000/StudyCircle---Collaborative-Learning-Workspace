@@ -65,6 +65,11 @@ export default function Home() {
   const [recoveryPin, setRecoveryPin] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
+  // Password visibility states
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [formLoading, setFormLoading] = useState(false);
@@ -505,13 +510,21 @@ export default function Home() {
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500"><Lock className="h-4.5 w-4.5" /></span>
                       <input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full pl-10 pr-4 py-3 bg-zinc-955 border border-zinc-800 focus:border-violet-500 rounded-2xl text-zinc-100 placeholder-zinc-650 focus:ring-2 focus:ring-violet-500/20 transition-all outline-none text-xs"
+                        className="w-full pl-10 pr-10 py-3 bg-zinc-955 border border-zinc-800 focus:border-violet-500 rounded-2xl text-zinc-100 placeholder-zinc-650 focus:ring-2 focus:ring-violet-500/20 transition-all outline-none text-xs"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-sm hover:scale-110 active:scale-95 transition-all cursor-pointer select-none"
+                        title={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? '👁️' : '🙈'}
+                      </button>
                     </div>
                   </div>
 
@@ -609,13 +622,21 @@ export default function Home() {
                       <div className="relative">
                         <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500"><Lock className="h-4 w-4" /></span>
                         <input
-                          type="password"
+                          type={showRegPassword ? "text" : "password"}
                           required
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full pl-9 pr-3 py-2.5 bg-zinc-955 border border-zinc-800 focus:border-violet-500 rounded-xl text-zinc-100 placeholder-zinc-650 focus:ring-1 focus:ring-violet-500/20 transition-all outline-none text-xs"
+                          className="w-full pl-9 pr-9 py-2.5 bg-zinc-955 border border-zinc-800 focus:border-violet-500 rounded-xl text-zinc-100 placeholder-zinc-650 focus:ring-1 focus:ring-violet-500/20 transition-all outline-none text-xs"
                         />
+                        <button
+                          type="button"
+                          onClick={() => setShowRegPassword(!showRegPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm hover:scale-110 active:scale-95 transition-all cursor-pointer select-none"
+                          title={showRegPassword ? "Hide password" : "Show password"}
+                        >
+                          {showRegPassword ? '👁️' : '🙈'}
+                        </button>
                       </div>
                     </div>
                     <div className="space-y-1">
@@ -728,13 +749,21 @@ export default function Home() {
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500"><Lock className="h-4.5 w-4.5" /></span>
                       <input
-                        type="password"
+                        type={showNewPassword ? "text" : "password"}
                         required
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full pl-10 pr-4 py-3 bg-zinc-955 border border-zinc-800 focus:border-violet-500 rounded-2xl text-zinc-100 placeholder-zinc-650 focus:ring-2 focus:ring-violet-500/20 transition-all outline-none text-xs"
+                        className="w-full pl-10 pr-10 py-3 bg-zinc-955 border border-zinc-800 focus:border-violet-500 rounded-2xl text-zinc-100 placeholder-zinc-650 focus:ring-2 focus:ring-violet-500/20 transition-all outline-none text-xs"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-sm hover:scale-110 active:scale-95 transition-all cursor-pointer select-none"
+                        title={showNewPassword ? "Hide password" : "Show password"}
+                      >
+                        {showNewPassword ? '👁️' : '🙈'}
+                      </button>
                     </div>
                   </div>
 
