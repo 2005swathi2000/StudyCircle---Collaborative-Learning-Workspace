@@ -23,7 +23,8 @@ import {
   Award,
   Key,
   User,
-  AlertCircle
+  AlertCircle,
+  Shield
 } from 'lucide-react';
 
 const COLLEGES = [
@@ -123,7 +124,40 @@ export default function Home() {
     } catch (err: any) {
       const errMsg = err.message || 'Login failed. Please check credentials.';
       setFormError(errMsg);
-      showToast(errMsg, 'error');
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleQuickDemoLogin = async (demoUser: 'student' | 'mentor' | 'admin') => {
+    setFormError('');
+    setFormSuccess('');
+    setFormLoading(true);
+    let u = 'student.demo@studycircle.com';
+    if (demoUser === 'mentor') {
+      u = 'mentor.demo@studycircle.com';
+    } else if (demoUser === 'admin') {
+      u = 'admin.demo@studycircle.com';
+    }
+    const p = 'Demo@123';
+    
+    setUsername(u);
+    setPassword(p);
+
+    try {
+      const data = await apiRequest('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ username: u, password: p }),
+      });
+
+      setAuthToken(data.token);
+      setUserInfo(data.user);
+      localStorage.setItem('has_completed_onboarding', 'true');
+      showToast(`Logged in as Demo ${demoUser.charAt(0).toUpperCase() + demoUser.slice(1)}!`, 'success');
+      router.push('/dashboard');
+    } catch (err: any) {
+      const errMsg = err.message || 'Demo login failed. Please ensure backend is running.';
+      setFormError(errMsg);
     } finally {
       setFormLoading(false);
     }
@@ -136,19 +170,16 @@ export default function Home() {
 
     if (!name.trim() || !username.trim() || !password.trim()) {
       setFormError('Please fill in all fields.');
-      showToast('Please fill in all fields.', 'warning');
       return;
     }
 
     if (!role) {
       setFormError('Please select an account role.');
-      showToast('Please select an account role.', 'warning');
       return;
     }
 
     if (!college) {
       setFormError('Please select your college/institute.');
-      showToast('Please select your college/institute.', 'warning');
       return;
     }
 
@@ -176,7 +207,6 @@ export default function Home() {
     } catch (err: any) {
       const errMsg = err.message || 'Registration failed. Username might be taken.';
       setFormError(errMsg);
-      showToast(errMsg, 'error');
     } finally {
       setFormLoading(false);
     }
@@ -207,7 +237,6 @@ export default function Home() {
     } catch (err: any) {
       const errMsg = err.message || 'Password reset failed. Verify details.';
       setFormError(errMsg);
-      showToast(errMsg, 'error');
     } finally {
       setFormLoading(false);
     }
@@ -310,13 +339,44 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="pt-2">
-                <button
-                  onClick={() => setStep('motivation')}
-                  className="px-6 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs rounded-2xl shadow-xl shadow-violet-600/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer border border-violet-500"
-                >
-                  Next: Consistency & Worth <ArrowRight className="h-4 w-4" />
-                </button>
+              <div className="pt-4 flex flex-col gap-4">
+                <div>
+                  <button
+                    onClick={() => setStep('motivation')}
+                    className="px-6 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs rounded-2xl shadow-xl shadow-violet-600/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer border border-violet-500"
+                  >
+                    Next: Consistency & Worth <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+                
+                <div className="pt-4 border-t border-zinc-800/40 space-y-2 max-w-md">
+                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <Shield className="h-3.5 w-3.5 text-violet-400" /> Reviewers: Quick Demo Access
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => handleQuickDemoLogin('student')}
+                      className="py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-200 text-xs font-bold rounded-xl active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-black/30"
+                    >
+                      <User className="h-4 w-4 text-violet-400" />
+                      <span>Try Student Demo</span>
+                    </button>
+                    <button
+                      onClick={() => handleQuickDemoLogin('mentor')}
+                      className="py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-200 text-xs font-bold rounded-xl active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-black/30"
+                    >
+                      <GraduationCap className="h-4 w-4 text-indigo-400" />
+                      <span>Try Mentor Demo</span>
+                    </button>
+                    <button
+                      onClick={() => handleQuickDemoLogin('admin')}
+                      className="py-2.5 px-4 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-750 text-zinc-200 text-xs font-bold rounded-xl active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-black/30"
+                    >
+                      <Shield className="h-4 w-4 text-emerald-400" />
+                      <span>Try Admin Demo</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -462,6 +522,37 @@ export default function Home() {
                   >
                     {formLoading ? <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>Sign In <ArrowRight className="h-4 w-4" /></>}
                   </button>
+
+                  {/* Quick Demo Login */}
+                  <div className="pt-3 border-t border-zinc-800/80 space-y-2 mt-3 text-center">
+                    <p className="text-[10px] font-bold text-zinc-550 tracking-wider uppercase">Quick Demo Login</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleQuickDemoLogin('student')}
+                        className="py-2 px-1 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 text-[9px] font-bold rounded-xl active:scale-95 transition-all cursor-pointer flex flex-col items-center justify-center gap-1 animate-pulse"
+                      >
+                        <User className="h-4 w-4 text-violet-400" />
+                        <span>Try Student Demo</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickDemoLogin('mentor')}
+                        className="py-2 px-1 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 text-[9px] font-bold rounded-xl active:scale-95 transition-all cursor-pointer flex flex-col items-center justify-center gap-1 animate-pulse"
+                      >
+                        <GraduationCap className="h-4 w-4 text-indigo-400" />
+                        <span>Try Mentor Demo</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickDemoLogin('admin')}
+                        className="py-2 px-1 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 text-[9px] font-bold rounded-xl active:scale-95 transition-all cursor-pointer flex flex-col items-center justify-center gap-1"
+                      >
+                        <Shield className="h-4 w-4 text-emerald-400" />
+                        <span>Try Admin Demo</span>
+                      </button>
+                    </div>
+                  </div>
 
                   <p className="text-center text-xs text-zinc-400 pt-2">
                     New to StudyCircle?{' '}

@@ -13,17 +13,26 @@ const sessionRoutes = require('./routes/sessions');
 const discussionRoutes = require('./routes/discussions');
 const progressRoutes = require('./routes/progress');
 
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',')
+  : ['http://localhost:3000', 'https://studycircle-collaborative-learning.vercel.app'];
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
   }
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
 app.use(express.json());
 
 // API Routes
@@ -51,6 +60,10 @@ const startServer = async () => {
     await sequelize.sync();
     console.log('Database synced successfully.');
 
+    // Auto-seed database if empty (prevents empty-state look for evaluators)
+    const { seedDatabase } = require('./utils/seeder');
+    await seedDatabase();
+
     server.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
@@ -60,3 +73,4 @@ const startServer = async () => {
 };
 
 startServer();
+

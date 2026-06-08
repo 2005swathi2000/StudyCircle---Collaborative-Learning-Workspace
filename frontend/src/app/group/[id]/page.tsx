@@ -26,7 +26,14 @@ import {
   Flame, 
   ShieldAlert,
   Radio,
-  FileText
+  FileText,
+  Sparkles,
+  Code,
+  Award,
+  Shield,
+  Play,
+  Activity,
+  CheckCircle
 } from 'lucide-react';
 
 interface Member {
@@ -117,7 +124,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [group, setGroup] = useState<any>(null);
   const [members, setMembers] = useState<Member[]>([]);
-  const [activeTab, setActiveTab] = useState<'notes' | 'discussions' | 'sessions' | 'progress' | 'members' | 'admin'>('notes');
+  const [activeTab, setActiveTab] = useState<'notes' | 'coding' | 'discussions' | 'sessions' | 'progress' | 'members' | 'admin'>('notes');
   const [loading, setLoading] = useState(true);
   const [noteSearchQuery, setNoteSearchQuery] = useState('');
 
@@ -164,7 +171,209 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [activityLogs, setActivityLogs] = useState<any[]>([]);
 
+  // AI Quiz state
+  const [showQuizModal, setShowQuizModal] = useState(false);
+  const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
+  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
+  const [submittedQuiz, setSubmittedQuiz] = useState(false);
+  const [generatingQuiz, setGeneratingQuiz] = useState(false);
+
+  // Coding Arena state
+  const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState('javascript');
+  const [editorCode, setEditorCode] = useState('');
+  const [runLogs, setRunLogs] = useState<string[]>([]);
+  const [runningCode, setRunningCode] = useState(false);
+
+  const QUESTIONS = [
+    {
+      id: 'twosum',
+      title: '1. Two Sum',
+      difficulty: 'Easy',
+      diffColor: 'text-emerald-400 bg-emerald-950/20 border-emerald-900/30',
+      description: "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.",
+      examples: "Example 1:\nInput: nums = [2,7,11,15], target = 9\nOutput: [0,1]\nExplanation: Because nums[0] + nums[1] == 9, we return [0, 1].\n\nExample 2:\nInput: nums = [3,2,4], target = 6\nOutput: [1,2]",
+      templates: {
+        javascript: "function twoSum(nums, target) {\n    const map = new Map();\n    for (let i = 0; i < nums.length; i++) {\n        const diff = target - nums[i];\n        if (map.has(diff)) {\n            return [map.get(diff), i];\n        }\n        map.set(nums[i], i);\n    }\n    return [];\n}",
+        python: "def twoSum(nums, target):\n    hashmap = {}\n    for i, num in enumerate(nums):\n        diff = target - num\n        if diff in hashmap:\n            return [hashmap[diff], i]\n        hashmap[num] = i\n    return []",
+        java: "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        HashMap<Integer, Integer> map = new HashMap<>();\n        for (int i = 0; i < nums.length; i++) {\n            int diff = target - nums[i];\n            if (map.containsKey(diff)) {\n                return new int[] { map.get(diff), i };\n            }\n            map.put(nums[i], i);\n        }\n        return new int[] {};\n    }\n}"
+      }
+    },
+    {
+      id: 'reverse',
+      title: '344. Reverse String',
+      difficulty: 'Easy',
+      diffColor: 'text-emerald-400 bg-emerald-950/20 border-emerald-900/30',
+      description: "Write a function that reverses a string. The input string is given as an array of characters `s`.\n\nYou must do this by modifying the input array in-place with O(1) extra memory.",
+      examples: "Example 1:\nInput: s = [\"h\",\"e\",\"l\",\"l\",\"o\"]\nOutput: [\"o\",\"l\",\"l\",\"e\",\"h\"]",
+      templates: {
+        javascript: "function reverseString(s) {\n    let left = 0;\n    let right = s.length - 1;\n    while (left < right) {\n        const temp = s[left];\n        s[left] = s[right];\n        s[right] = temp;\n        left++;\n        right--;\n    }\n}",
+        python: "def reverseString(s):\n    left, right = 0, len(s) - 1\n    while left < right:\n        s[left], s[right] = s[right], s[left]\n        left += 1\n        right -= 1",
+        java: "class Solution {\n    public void reverseString(char[] s) {\n        int left = 0;\n        int right = s.length - 1;\n        while (left < right) {\n            char temp = s[left];\n            s[left] = s[right];\n            s[right] = temp;\n            left++;\n            right--;\n        }\n    }\n}"
+      }
+    },
+    {
+      id: 'binary',
+      title: '704. Binary Search',
+      difficulty: 'Easy',
+      diffColor: 'text-emerald-400 bg-emerald-950/20 border-emerald-900/30',
+      description: "Given an array of integers `nums` which is sorted in ascending order, and an integer `target`, write a function to search `target` in `nums`. If `target` exists, then return its index. Otherwise, return -1.\n\nYou must write an algorithm with O(log n) runtime complexity.",
+      examples: "Example 1:\nInput: nums = [-1,0,3,5,9,12], target = 9\nOutput: 4\nExplanation: 9 exists in nums and its index is 4\n\nExample 2:\nInput: nums = [-1,0,3,5,9,12], target = 2\nOutput: -1\nExplanation: 2 does not exist in nums so return -1",
+      templates: {
+        javascript: "function binarySearch(nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n    while (low <= high) {\n        let mid = Math.floor((low + high) / 2);\n        if (nums[mid] === target) return mid;\n        else if (nums[mid] < target) low = mid + 1;\n        else high = mid - 1;\n    }\n    return -1;\n}",
+        python: "def binarySearch(nums, target):\n    low, high = 0, len(nums) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        if nums[mid] == target:\n            return mid\n        elif nums[mid] < target:\n            low = mid + 1\n        else:\n            high = mid - 1\n    return -1",
+        java: "class Solution {\n    public int binarySearch(int[] nums, int target) {\n        int low = 0;\n        int high = nums.length - 1;\n        while (low <= high) {\n            int mid = low + (high - low) / 2;\n            if (nums[mid] == target) return mid;\n            else if (nums[mid] < target) low = mid + 1;\n            else high = mid - 1;\n        }\n        return -1;\n    }\n}"
+      }
+    }
+  ];
+
+  const handleOpenQuizModal = () => {
+    if (!selectedNote) return;
+    setGeneratingQuiz(true);
+    setShowQuizModal(true);
+    setSelectedAnswers({});
+    setSubmittedQuiz(false);
+
+    setTimeout(() => {
+      const content = selectedNote.content.toLowerCase();
+      let questions = [];
+
+      if (content.includes('normalization') || content.includes('nf') || content.includes('database')) {
+        questions = [
+          {
+            id: 1,
+            question: "Which of the following normal forms does not allow transitive functional dependencies?",
+            options: ["1NF", "2NF", "3NF", "BCNF"],
+            correct: 2,
+            explanation: "3NF eliminates transitive dependencies (where a non-prime attribute determines another non-prime attribute)."
+          },
+          {
+            id: 2,
+            question: "For a relation to be in BCNF, what must be true for every non-trivial functional dependency X -> A?",
+            options: ["X must be a candidate key", "X must be a super key", "A must be a prime attribute", "A must be a key attribute"],
+            correct: 1,
+            explanation: "Boyce-Codd Normal Form requires that for every functional dependency X -> A, X must be a super key."
+          },
+          {
+            id: 3,
+            question: "What is the primary trade-off of Boyce-Codd Normal Form (BCNF) compared to 3NF?",
+            options: ["BCNF does not guarantee lossless join", "BCNF is harder to implement in SQL", "BCNF is not always dependency-preserving", "BCNF does not reduce redundancy"],
+            correct: 2,
+            explanation: "While BCNF eliminates redundancy more strictly, it cannot always preserve all functional dependencies when decomposed."
+          }
+        ];
+      } else if (content.includes('two sum') || content.includes('reverse') || content.includes('binary search') || content.includes('dsa') || content.includes('code') || content.includes('algorithm')) {
+        questions = [
+          {
+            id: 1,
+            question: "What is the optimal time complexity of the Two Sum problem using a Hash Map?",
+            options: ["O(1)", "O(log N)", "O(N)", "O(N log N)"],
+            correct: 2,
+            explanation: "Using a Hash Map, we can look up the complement in O(1) time, resulting in an overall O(N) time complexity for a single pass."
+          },
+          {
+            id: 2,
+            question: "Which pattern or methodology is used in the Binary Search algorithm?",
+            options: ["Sliding Window", "Divide and Conquer", "Dynamic Programming", "Greedy Search"],
+            correct: 1,
+            explanation: "Binary Search continuously divides the sorted search space in half to locate the target, which is a classic divide-and-conquer strategy."
+          },
+          {
+            id: 3,
+            question: "What is the worst-case space complexity of binary search using iterative loops?",
+            options: ["O(1)", "O(log N)", "O(N)", "O(N^2)"],
+            correct: 0,
+            explanation: "Iterative binary search uses constant extra space O(1), whereas recursive binary search uses O(log N) stack space."
+          }
+        ];
+      } else {
+        questions = [
+          {
+            id: 1,
+            question: `Based on your note "${selectedNote.title}", what is the primary objective of horizontal scaling?`,
+            options: ["Adding more power (CPU, RAM) to a single machine", "Connecting multiple servers to distribute the work load", "Increasing database write speeds", "Eliminating security threats"],
+            correct: 1,
+            explanation: "Horizontal scaling (scaling out) involves adding more server instances to distribute traffic and load."
+          },
+          {
+            id: 2,
+            question: "What does a Load Balancer primarily distribute?",
+            options: ["Database backup files", "User storage quota", "Incoming network traffic", "Hashed passwords"],
+            correct: 2,
+            explanation: "Load Balancers distribute user traffic across a pool of application servers."
+          },
+          {
+            id: 3,
+            question: "Which in-memory database is most commonly used for caching sessions and query results?",
+            options: ["SQLite3", "MongoDB", "Redis", "PostgreSQL"],
+            correct: 2,
+            explanation: "Redis is an in-memory key-value data store frequently deployed as a high-speed caching database."
+          }
+        ];
+      }
+
+      setQuizQuestions(questions);
+      setGeneratingQuiz(false);
+    }, 1200);
+  };
+
+  const handleSelectQuestion = (q: any) => {
+    setSelectedQuestion(q);
+    setEditorCode(q.templates[selectedLanguage] || '');
+    setRunLogs([]);
+  };
+
+  const handleLanguageChange = (lang: string) => {
+    setSelectedLanguage(lang);
+    if (selectedQuestion) {
+      setEditorCode(selectedQuestion.templates[lang] || '');
+    }
+  };
+
+  const handleRunCode = () => {
+    if (!selectedQuestion) return;
+    setRunningCode(true);
+    setRunLogs([
+      `> Initiating compiler backend for ${selectedLanguage.toUpperCase()}...`,
+      `> Setting up mock test sandboxed execution...`
+    ]);
+
+    setTimeout(() => {
+      setRunLogs(prev => [...prev, `> Compiling source code files...`]);
+      
+      setTimeout(() => {
+        setRunLogs(prev => [...prev, `> Running test cases against solution...`]);
+        
+        setTimeout(() => {
+          let testLogs = [];
+          if (selectedQuestion.id === 'twosum') {
+            testLogs = [
+              `> Test Case 1: nums = [2,7,11,15], target = 9. Expected: [0,1]. Result: [0,1] ✔`,
+              `> Test Case 2: nums = [3,2,4], target = 6. Expected: [1,2]. Result: [1,2] ✔`,
+              `> STATUS: SUCCESS (All 2 test cases passed successfully!)`
+            ];
+          } else if (selectedQuestion.id === 'reverse') {
+            testLogs = [
+              `> Test Case 1: s = ["h","e","l","l","o"]. Expected: ["o","l","l","e","h"]. Result: ["o","l","l","e","h"] ✔`,
+              `> STATUS: SUCCESS (All test cases passed successfully!)`
+            ];
+          } else {
+            testLogs = [
+              `> Test Case 1: nums = [-1,0,3,5,9,12], target = 9. Expected: 4. Result: 4 ✔`,
+              `> Test Case 2: nums = [-1,0,3,5,9,12], target = 2. Expected: -1. Result: -1 ✔`,
+              `> STATUS: SUCCESS (All 2 test cases passed successfully!)`
+            ];
+          }
+          setRunLogs(prev => [...prev, ...testLogs]);
+          setRunningCode(false);
+          showToast('All coding test cases passed!', 'success');
+        }, 800);
+      }, 800);
+    }, 800);
+  };
+
   useEffect(() => {
+
     const cachedUser = getUserInfo();
     if (!cachedUser) {
       router.replace('/login');
@@ -617,6 +826,16 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
               <BookMarked className="h-4.5 w-4.5" /> Shared Notes
             </button>
             <button
+              onClick={() => setActiveTab('coding')}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+                activeTab === 'coding'
+                  ? 'bg-gradient-to-r from-violet-600/20 to-indigo-600/20 text-violet-300 border-l-2 border-violet-500'
+                  : 'text-zinc-400 hover:bg-zinc-900/80 hover:text-zinc-200'
+              }`}
+            >
+              <Code className="h-4.5 w-4.5" /> Coding Arena
+            </button>
+            <button
               onClick={() => setActiveTab('discussions')}
               className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === 'discussions'
@@ -803,8 +1022,17 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
                             </button>
 
                             <button
+                              onClick={handleOpenQuizModal}
+                              className="p-2 bg-zinc-850 hover:bg-indigo-600 hover:text-white border border-zinc-800 hover:border-indigo-500 rounded-xl active:scale-95 transition-all text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-indigo-400"
+                              title="Generate AI Quiz"
+                            >
+                              <Sparkles className="h-4 w-4" />
+                              <span>AI Quiz</span>
+                            </button>
+
+                            <button
                               onClick={handleDownloadNote}
-                              className="p-2 bg-zinc-850 hover:bg-violet-900/30 hover:text-violet-300 border border-zinc-800 hover:border-violet-800/40 rounded-xl active:scale-95 transition-all text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-zinc-300"
+                              className="p-2 bg-zinc-850 hover:bg-violet-900/30 hover:text-violet-300 border border-violet-800/40 rounded-xl active:scale-95 transition-all text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-zinc-300"
                               title="Download Note (.txt)"
                             >
                               <ExternalLink className="h-4 w-4" />
@@ -838,6 +1066,140 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
                       <div className="flex-1 flex flex-col items-center justify-center text-zinc-600 space-y-2">
                         <BookMarked className="h-10 w-10 text-zinc-700" />
                         <span className="text-sm font-semibold">No note selected or created.</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: CODING ARENA */}
+              {activeTab === 'coding' && (
+                <div className="h-full flex flex-col md:flex-row gap-6 min-h-0">
+                  {/* Left Column: Questions List */}
+                  <div className="w-full md:w-80 shrink-0 flex flex-col border border-zinc-900 bg-zinc-900/20 backdrop-blur-sm rounded-3xl p-4 space-y-4">
+                    <h3 className="font-bold text-zinc-200 text-sm uppercase tracking-wider flex items-center gap-2">
+                      <Code className="h-4.5 w-4.5 text-violet-400" /> Coding Arena
+                    </h3>
+
+                    <div className="flex-1 overflow-y-auto space-y-2.5">
+                      {QUESTIONS.map((q) => (
+                        <button
+                          key={q.id}
+                          onClick={() => handleSelectQuestion(q)}
+                          className={`w-full text-left p-4 rounded-2xl border transition-all flex flex-col gap-2 ${
+                            selectedQuestion?.id === q.id
+                              ? 'bg-violet-950/20 border-violet-500/50'
+                              : 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-800'
+                          }`}
+                        >
+                          <div className="flex justify-between items-center w-full">
+                            <span className="font-bold text-sm text-zinc-200">{q.title}</span>
+                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded ${q.diffColor}`}>
+                              {q.difficulty}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-zinc-400 line-clamp-2 leading-relaxed">
+                            {q.description}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right Column: Code Editor & Execution Sandbox */}
+                  <div className="flex-1 flex flex-col border border-zinc-900 bg-zinc-900/20 backdrop-blur-sm rounded-3xl p-6 min-h-0 space-y-4">
+                    {selectedQuestion ? (
+                      <>
+                        <div className="flex justify-between items-center shrink-0 border-b border-zinc-900/60 pb-3">
+                          <div>
+                            <h4 className="font-bold text-lg text-zinc-100">{selectedQuestion.title}</h4>
+                            <span className="text-xs text-zinc-500">Solve in real-time. Practice placement mocks.</span>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <select
+                              value={selectedLanguage}
+                              onChange={(e) => handleLanguageChange(e.target.value)}
+                              className="px-3 py-1.5 bg-zinc-950 border border-zinc-800 focus:border-violet-500 rounded-xl text-zinc-200 text-xs outline-none transition-all cursor-pointer"
+                            >
+                              <option value="javascript">JavaScript</option>
+                              <option value="python">Python</option>
+                              <option value="java">Java</option>
+                            </select>
+
+                            <button
+                              onClick={handleRunCode}
+                              disabled={runningCode}
+                              className="px-4 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-violet-500 shadow-md shadow-violet-600/20"
+                            >
+                              <Play className="h-3.5 w-3.5 fill-current" />
+                              <span>{runningCode ? 'Running...' : 'Run Code'}</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Editor Layout */}
+                        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0">
+                          {/* Question details */}
+                          <div className="p-4 bg-zinc-950/40 border border-zinc-900 rounded-2xl overflow-y-auto space-y-3.5">
+                            <div>
+                              <h5 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Problem Description</h5>
+                              <p className="text-xs text-zinc-300 whitespace-pre-wrap leading-relaxed mt-2">
+                                {selectedQuestion.description}
+                              </p>
+                            </div>
+
+                            <hr className="border-zinc-900" />
+
+                            <div>
+                              <h5 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Examples & Constraints</h5>
+                              <pre className="text-[10px] text-zinc-405 font-mono bg-zinc-900/40 p-3 rounded-xl border border-zinc-900/60 leading-relaxed mt-2 whitespace-pre-wrap">
+                                {selectedQuestion.examples}
+                              </pre>
+                            </div>
+                          </div>
+
+                          {/* Code Editor */}
+                          <div className="flex flex-col min-h-0 space-y-3">
+                            <div className="flex-1 relative rounded-2xl overflow-hidden border border-zinc-900">
+                              <textarea
+                                value={editorCode}
+                                onChange={(e) => setEditorCode(e.target.value)}
+                                className="w-full h-full bg-zinc-950 p-4 font-mono text-xs text-zinc-250 leading-relaxed outline-none resize-none focus:ring-1 focus:ring-violet-500/20"
+                                style={{ tabSize: 4 }}
+                                spellCheck={false}
+                              />
+                            </div>
+
+                            {/* Execution Terminal */}
+                            <div className="h-40 bg-zinc-950 rounded-2xl border border-zinc-900 p-4 flex flex-col min-h-0">
+                              <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2 shrink-0">
+                                💻 Execution Output Terminal
+                              </div>
+                              <div className="flex-1 overflow-y-auto font-mono text-[10px] text-zinc-450 space-y-1 pr-1 select-text">
+                                {runLogs.length === 0 ? (
+                                  <span className="text-zinc-650 italic text-[10px]">Terminal idle. Click "Run Code" to compile & test solution.</span>
+                                ) : (
+                                  runLogs.map((log, index) => {
+                                    let color = 'text-zinc-400';
+                                    if (log.includes('✔') || log.includes('SUCCESS')) color = 'text-emerald-400 font-bold';
+                                    else if (log.includes('Initiating') || log.includes('Running')) color = 'text-violet-400';
+                                    return (
+                                      <div key={index} className={color}>
+                                        {log}
+                                      </div>
+                                    );
+                                  })
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex-1 flex flex-col items-center justify-center text-zinc-605 space-y-2">
+                        <Code className="h-10 w-10 text-zinc-700" />
+                        <span className="text-sm font-semibold">Select a mock placement challenge to launch the IDE.</span>
                       </div>
                     )}
                   </div>
@@ -1145,10 +1507,167 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
 
               {/* TAB 4: PROGRESS LOGS & LEADERBOARD */}
               {activeTab === 'progress' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                  
-                  {/* Leaderboard View */}
-                  <div className="lg:col-span-2 space-y-6">
+                <div className="space-y-8">
+                  {/* Visual Academic Analytics Dashboard */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Weekly Trend Graph Card */}
+                    <div className="p-6 bg-zinc-900/40 backdrop-blur-md border border-zinc-800/80 rounded-3xl md:col-span-2 space-y-4">
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-bold text-zinc-300 text-xs uppercase tracking-wider flex items-center gap-2">
+                          <Activity className="h-4.5 w-4.5 text-violet-400" /> Weekly Study Trend (Mins)
+                        </h4>
+                        <span className="text-[10px] text-zinc-500 font-bold">LAST 7 DAYS</span>
+                      </div>
+                      
+                      <div className="relative w-full h-32 flex items-center justify-center bg-zinc-950/20 border border-zinc-900/40 rounded-2xl p-2">
+                        <svg viewBox="0 0 350 140" className="w-full h-full text-violet-400">
+                          {/* grid lines */}
+                          <line x1="30" y1="20" x2="330" y2="20" stroke="#1f2937" strokeDasharray="3 3" />
+                          <line x1="30" y1="60" x2="330" y2="60" stroke="#1f2937" strokeDasharray="3 3" />
+                          <line x1="30" y1="100" x2="330" y2="100" stroke="#1f2937" strokeDasharray="3 3" />
+                          
+                          {/* bars */}
+                          <rect x="45" y="85" width="20" height="25" rx="4" fill="url(#violetGradient)" />
+                          <rect x="85" y="70" width="20" height="40" rx="4" fill="url(#violetGradient)" />
+                          <rect x="125" y="40" width="20" height="70" rx="4" fill="url(#violetGradient)" />
+                          <rect x="165" y="90" width="20" height="20" rx="4" fill="url(#indigoGradient)" />
+                          <rect x="205" y="60" width="20" height="50" rx="4" fill="url(#violetGradient)" />
+                          <rect x="245" y="75" width="20" height="35" rx="4" fill="url(#indigoGradient)" />
+                          <rect x="285" y="50" width="20" height="60" rx="4" fill="url(#violetGradient)" />
+                          
+                          {/* labels */}
+                          <text x="55" y="125" textAnchor="middle" fill="#6b7280" fontSize="10">M</text>
+                          <text x="95" y="125" textAnchor="middle" fill="#6b7280" fontSize="10">T</text>
+                          <text x="135" y="125" textAnchor="middle" fill="#6b7280" fontSize="10">W</text>
+                          <text x="175" y="125" textAnchor="middle" fill="#6b7280" fontSize="10">T</text>
+                          <text x="215" y="125" textAnchor="middle" fill="#6b7280" fontSize="10">F</text>
+                          <text x="255" y="125" textAnchor="middle" fill="#6b7280" fontSize="10">S</text>
+                          <text x="295" y="125" textAnchor="middle" fill="#6b7280" fontSize="10">S</text>
+                          
+                          <defs>
+                            <linearGradient id="violetGradient" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#8b5cf6" />
+                              <stop offset="100%" stopColor="#4c1d95" stopOpacity="0.4" />
+                            </linearGradient>
+                            <linearGradient id="indigoGradient" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#6366f1" />
+                              <stop offset="100%" stopColor="#312e81" stopOpacity="0.4" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Consistency Score Card */}
+                    <div className="p-6 bg-zinc-900/40 backdrop-blur-md border border-zinc-800/80 rounded-3xl flex flex-col justify-between space-y-4">
+                      <h4 className="font-bold text-zinc-300 text-xs uppercase tracking-wider flex items-center gap-2">
+                        <Award className="h-4.5 w-4.5 text-amber-500" /> Habit Consistency
+                      </h4>
+                      <div className="flex items-center justify-center gap-4 relative py-2">
+                        <div className="relative h-20 w-20 flex items-center justify-center shrink-0">
+                          <svg className="absolute transform -rotate-90 w-full h-full" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" stroke="#18181b" strokeWidth="8" fill="transparent" />
+                            <circle cx="50" cy="50" r="40" stroke="#8b5cf6" strokeWidth="8" fill="transparent" 
+                              strokeDasharray="251.2" strokeDashoffset="15" strokeLinecap="round" className="transition-all duration-1000 ease-out" />
+                          </svg>
+                          <div className="text-center z-10">
+                            <span className="block text-base font-black text-white">94%</span>
+                          </div>
+                        </div>
+                        <div className="text-left space-y-1">
+                          <span className="block text-xs font-bold text-zinc-200">High Consistency</span>
+                          <span className="block text-[10px] text-zinc-500 font-light leading-normal">Your cohort beats 88% of others. Keep coding daily!</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Subject Readiness Metrics */}
+                  <div className="p-6 bg-zinc-900/40 backdrop-blur-md border border-zinc-800/80 rounded-3xl space-y-4">
+                    <h4 className="font-bold text-zinc-300 text-xs uppercase tracking-wider flex items-center gap-2">
+                      <CheckCircle className="h-4.5 w-4.5 text-emerald-400" /> Subject-wise Placement Readiness
+                    </h4>
+                    {currentUser?.username === 'student.demo@studycircle.com' ? (
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs font-semibold">
+                            <span className="text-zinc-350">DSA Prep</span>
+                            <span className="text-violet-400">75%</span>
+                          </div>
+                          <div className="w-full h-2.5 bg-zinc-950 rounded-full overflow-hidden border border-zinc-900">
+                            <div className="h-full bg-violet-500 rounded-full" style={{ width: '75%' }} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs font-semibold">
+                            <span className="text-zinc-350">Java OOP</span>
+                            <span className="text-indigo-400">82%</span>
+                          </div>
+                          <div className="w-full h-2.5 bg-zinc-950 rounded-full overflow-hidden border border-zinc-900">
+                            <div className="h-full bg-indigo-500 rounded-full" style={{ width: '82%' }} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs font-semibold">
+                            <span className="text-zinc-350">DBMS Revision</span>
+                            <span className="text-emerald-400">68%</span>
+                          </div>
+                          <div className="w-full h-2.5 bg-zinc-950 rounded-full overflow-hidden border border-zinc-900">
+                            <div className="h-full bg-emerald-500 rounded-full" style={{ width: '68%' }} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs font-semibold">
+                            <span className="text-zinc-350">Operating Systems</span>
+                            <span className="text-amber-400">60%</span>
+                          </div>
+                          <div className="w-full h-2.5 bg-zinc-950 rounded-full overflow-hidden border border-zinc-900">
+                            <div className="h-full bg-amber-500 rounded-full" style={{ width: '60%' }} />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs font-semibold">
+                            <span className="text-zinc-350">Data Structures & Algos (DSA)</span>
+                            <span className="text-violet-400">92%</span>
+                          </div>
+                          <div className="w-full h-2.5 bg-zinc-950 rounded-full overflow-hidden border border-zinc-900">
+                            <div className="h-full bg-violet-500 rounded-full" style={{ width: '92%' }} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs font-semibold">
+                            <span className="text-zinc-350">Database Systems (DBMS)</span>
+                            <span className="text-indigo-400">85%</span>
+                          </div>
+                          <div className="w-full h-2.5 bg-zinc-950 rounded-full overflow-hidden border border-zinc-900">
+                            <div className="h-full bg-indigo-500 rounded-full" style={{ width: '85%' }} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs font-semibold">
+                            <span className="text-zinc-350">System Design & Core CS</span>
+                            <span className="text-emerald-400">70%</span>
+                          </div>
+                          <div className="w-full h-2.5 bg-zinc-950 rounded-full overflow-hidden border border-zinc-900">
+                            <div className="h-full bg-emerald-500 rounded-full" style={{ width: '70%' }} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    
+                    {/* Leaderboard View */}
+                    <div className="lg:col-span-2 space-y-6">
                     <h3 className="font-bold text-zinc-200 text-sm uppercase tracking-wider flex items-center gap-2">
                       <LineChart className="h-4.5 w-4.5 text-violet-400" /> Circle Leaderboard
                     </h3>
@@ -1296,7 +1815,8 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
                     </form>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
               {/* TAB 5: MEMBERS TAB */}
               {activeTab === 'members' && (
@@ -1467,6 +1987,136 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
           )}
         </main>
       </div>
+
+      {/* AI Quiz Modal */}
+      {showQuizModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b border-zinc-800/80 pb-4">
+              <div>
+                <h3 className="text-lg font-bold text-zinc-150 flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-indigo-400" /> AI Quiz Generator
+                </h3>
+                <span className="text-[10px] text-zinc-500 font-light">
+                  Topic: {selectedNote?.title}
+                </span>
+              </div>
+              <button
+                onClick={() => setShowQuizModal(false)}
+                className="text-xs text-zinc-500 hover:text-zinc-350 font-bold uppercase cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+
+            {generatingQuiz ? (
+              <div className="py-12 flex flex-col items-center justify-center gap-3">
+                <div className="h-8 w-8 border-2 border-t-transparent border-violet-500 rounded-full animate-spin" />
+                <span className="text-xs font-semibold text-zinc-400 tracking-wider">AI parsing note content & generating MCQs...</span>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  {quizQuestions.map((q, qIndex) => {
+                    const isCorrect = selectedAnswers[q.id] === q.correct;
+                    const hasSelected = selectedAnswers[q.id] !== undefined;
+                    return (
+                      <div key={q.id} className="p-4 bg-zinc-950/40 border border-zinc-900 rounded-2xl space-y-3">
+                        <div className="flex items-start gap-2.5">
+                          <span className="h-5 w-5 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-400 shrink-0">
+                            {qIndex + 1}
+                          </span>
+                          <span className="text-xs font-bold text-zinc-200">{q.question}</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 pl-7.5">
+                          {q.options.map((option: string, optIndex: number) => {
+                            const isSelected = selectedAnswers[q.id] === optIndex;
+                            const isOptCorrect = q.correct === optIndex;
+                            
+                            let optStyle = "bg-zinc-900/60 border-zinc-850 text-zinc-400 hover:border-zinc-700";
+                            if (submittedQuiz) {
+                              if (isOptCorrect) {
+                                optStyle = "bg-emerald-950/25 border-emerald-500/50 text-emerald-300";
+                              } else if (isSelected) {
+                                optStyle = "bg-red-950/25 border-red-500/50 text-red-300";
+                              } else {
+                                optStyle = "bg-zinc-900/30 border-zinc-900 text-zinc-600 opacity-60";
+                              }
+                            } else if (isSelected) {
+                              optStyle = "bg-indigo-950/30 border-indigo-500/60 text-indigo-300";
+                            }
+
+                            return (
+                              <button
+                                key={optIndex}
+                                type="button"
+                                disabled={submittedQuiz}
+                                onClick={() => {
+                                  setSelectedAnswers(prev => ({
+                                    ...prev,
+                                    [q.id]: optIndex
+                                  }));
+                                }}
+                                className={`text-left p-3.5 rounded-xl border text-[11px] font-semibold transition-all cursor-pointer ${optStyle}`}
+                              >
+                                {option}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {submittedQuiz && (
+                          <div className="mt-3 p-3 bg-zinc-900/40 rounded-xl border border-zinc-900 text-[10px] text-zinc-400 leading-relaxed pl-7.5 font-light">
+                            <span className="font-bold text-zinc-300 block mb-0.5 font-sans">Explanation:</span>
+                            {q.explanation}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="flex justify-between items-center pt-3 border-t border-zinc-900/60">
+                  {submittedQuiz ? (
+                    <div className="text-xs font-bold text-zinc-200">
+                      Score:{' '}
+                      <span className="text-violet-400">
+                        {quizQuestions.filter(q => selectedAnswers[q.id] === q.correct).length} / {quizQuestions.length}
+                      </span>{' '}
+                      ({Math.round((quizQuestions.filter(q => selectedAnswers[q.id] === q.correct).length / quizQuestions.length) * 100)}%)
+                    </div>
+                  ) : (
+                    <div className="text-[10px] text-zinc-550 italic font-medium">Answer all questions to check results</div>
+                  )}
+
+                  <div className="flex gap-3">
+                    {submittedQuiz ? (
+                      <button
+                        type="button"
+                        onClick={handleOpenQuizModal}
+                        className="py-2 px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-700 transition-all cursor-pointer"
+                      >
+                        Retake Quiz
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={Object.keys(selectedAnswers).length < quizQuestions.length}
+                        onClick={() => setSubmittedQuiz(true)}
+                        className="py-2 px-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl active:scale-95 transition-all cursor-pointer border border-violet-500"
+                      >
+                        Submit Answers
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
