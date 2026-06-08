@@ -1,8 +1,16 @@
 let rawUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-// Auto-correct spelling typo (k117 -> k1l7) in Render subdomain
-if (rawUrl.includes('studycircle-backend-k117.onrender.com')) {
-  rawUrl = rawUrl.replace('studycircle-backend-k117.onrender.com', 'studycircle-backend-k1l7.onrender.com');
+
+// Enforce correct Render domain (k1l7) when running in production Vercel environment
+if (typeof window !== 'undefined' && 
+    (window.location.hostname.includes('vercel.app') || rawUrl.includes('studycircle-backend'))) {
+  rawUrl = 'https://studycircle-backend-k1l7.onrender.com/api';
 }
+
+// Guarantee the URL ends with /api
+if (rawUrl.startsWith('http') && !rawUrl.endsWith('/api') && !rawUrl.includes('/api/')) {
+  rawUrl = rawUrl.replace(/\/$/, '') + '/api';
+}
+
 const BASE_URL = rawUrl;
 
 export const getAuthToken = (): string | null => {

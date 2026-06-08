@@ -5,10 +5,16 @@ let socket: Socket | null = null;
 export const getSocket = (): Socket => {
   if (!socket) {
     let rawSocketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
-    // Auto-correct spelling typo (k117 -> k1l7) in Render subdomain
-    if (rawSocketUrl.includes('studycircle-backend-k117.onrender.com')) {
-      rawSocketUrl = rawSocketUrl.replace('studycircle-backend-k117.onrender.com', 'studycircle-backend-k1l7.onrender.com');
+    
+    // Enforce correct Render domain (k1l7) when running in production Vercel environment
+    if (typeof window !== 'undefined' && 
+        (window.location.hostname.includes('vercel.app') || rawSocketUrl.includes('studycircle-backend'))) {
+      rawSocketUrl = 'https://studycircle-backend-k1l7.onrender.com';
     }
+    
+    // Ensure no trailing slash
+    rawSocketUrl = rawSocketUrl.replace(/\/$/, '');
+    
     const socketUrl = rawSocketUrl;
     socket = io(socketUrl, {
       autoConnect: false,
