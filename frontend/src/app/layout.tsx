@@ -16,6 +16,9 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "StudyCircle - Collaborative Learning Workspace",
   description: "StudyCircle is a collaborative group study platform tailored for engineering and degree students. It features real-time study rooms, shared notes, doubt boards, study session scheduling, and progress tracking.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
