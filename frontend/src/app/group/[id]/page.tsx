@@ -1360,7 +1360,13 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
               {activeTab === 'coding' && (
                 <div className="h-full flex flex-col md:flex-row gap-6 min-h-0">
                   {/* Left Column: Questions List */}
-                  <div className="w-full md:w-80 shrink-0 flex flex-col border border-zinc-900 bg-zinc-900/20 backdrop-blur-sm rounded-3xl p-4 space-y-4">
+                  <div 
+                    className="w-full md:w-80 shrink-0 flex flex-col backdrop-blur-sm rounded-3xl p-4 space-y-4"
+                    style={{ 
+                      background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.22) 0%, rgba(71, 85, 105, 0.15) 50%, rgba(148, 163, 184, 0.08) 100%)', 
+                      border: '1px solid rgba(148, 163, 184, 0.2)' 
+                    }}
+                  >
                     <h3 className="font-bold text-zinc-200 text-sm uppercase tracking-wider flex items-center gap-2">
                       <Code className="h-4.5 w-4.5 text-violet-400" /> Coding Arena
                     </h3>
