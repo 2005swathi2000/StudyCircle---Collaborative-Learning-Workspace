@@ -18,6 +18,31 @@
   --accent-indigo-650: #94A3B8;
   --accent-indigo-600: #4f46e5; /* Indigo */
   --accent-indigo-500: #6366f1;
+
+  /* Base zinc colors */
+  --zinc-955: #020617;
+  --zinc-950: #020617;
+  --zinc-900: #0B0F19;
+  --zinc-855: #1E293B;
+  --zinc-850: #1E293B;
+  --zinc-800: #334155;
+  --zinc-750: #475569;
+  --zinc-700: #475569;
+  --zinc-655: #94A3B8;
+  --zinc-650: #94A3B8;
+  --zinc-600: #94A3B8;
+  --zinc-555: #CBD5E1;
+  --zinc-550: #CBD5E1;
+  --zinc-500: #CBD5E1;
+  --zinc-450: #CBD5E1;
+  --zinc-400: #F8FAFC;
+  --zinc-350: #FFFFFF;
+  --zinc-300: #FFFFFF;
+  --zinc-250: #FFFFFF;
+  --zinc-200: #FFFFFF;
+  --zinc-150: #FFFFFF;
+  --zinc-100: #FFFFFF;
+  --zinc-50: #FFFFFF;
 }
 
 /* Dashboard Theme: Emerald & Teal (Green Accent) */
@@ -139,29 +164,29 @@
   --font-mono: var(--font-geist-mono);
 
   /* Redefine zinc colors for the Premium Dark Navy Theme mapping */
-  --color-zinc-955: #020617;
-  --color-zinc-950: #020617;
-  --color-zinc-900: #0B0F19;
-  --color-zinc-855: #1E293B;
-  --color-zinc-850: #1E293B;
-  --color-zinc-800: #334155;
-  --color-zinc-750: #475569;
-  --color-zinc-700: #475569;
-  --color-zinc-655: #94A3B8;
-  --color-zinc-650: #94A3B8;
-  --color-zinc-600: #94A3B8;
-  --color-zinc-555: #CBD5E1;
-  --color-zinc-550: #CBD5E1;
-  --color-zinc-500: #CBD5E1;
-  --color-zinc-450: #CBD5E1;
-  --color-zinc-400: #F8FAFC;
-  --color-zinc-350: #FFFFFF;
-  --color-zinc-300: #FFFFFF;
-  --color-zinc-250: #FFFFFF;
-  --color-zinc-200: #FFFFFF;
-  --color-zinc-150: #FFFFFF;
-  --color-zinc-100: #FFFFFF;
-  --color-zinc-50: #FFFFFF;
+  --color-zinc-955: var(--zinc-955);
+  --color-zinc-950: var(--zinc-950);
+  --color-zinc-900: var(--zinc-900);
+  --color-zinc-855: var(--zinc-855);
+  --color-zinc-850: var(--zinc-850);
+  --color-zinc-800: var(--zinc-800);
+  --color-zinc-750: var(--zinc-750);
+  --color-zinc-700: var(--zinc-700);
+  --color-zinc-655: var(--zinc-655);
+  --color-zinc-650: var(--zinc-650);
+  --color-zinc-600: var(--zinc-600);
+  --color-zinc-555: var(--zinc-555);
+  --color-zinc-550: var(--zinc-550);
+  --color-zinc-500: var(--zinc-500);
+  --color-zinc-450: var(--zinc-450);
+  --color-zinc-400: var(--zinc-400);
+  --color-zinc-350: var(--zinc-350);
+  --color-zinc-300: var(--zinc-300);
+  --color-zinc-250: var(--zinc-250);
+  --color-zinc-200: var(--zinc-200);
+  --color-zinc-150: var(--zinc-150);
+  --color-zinc-100: var(--zinc-100);
+  --color-zinc-50: var(--zinc-50);
   
   /* Redefine primary/secondary branding gradients to use dynamic CSS variables */
   --color-violet-950: var(--accent-violet-950);
@@ -295,4 +320,158 @@ html, body {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+/* ----------------------------------------------------
+   THEME BACKGROUND COLOR SELECTOR OVERRIDES
+   ---------------------------------------------------- */
+
+/* 1. Fully Black Theme Background */
+html.theme-bg-black {
+  --background: #000000 !important;
+  --zinc-955: #000000 !important;
+  --zinc-950: #000000 !important;
+  --zinc-900: #0B0B0C !important;
+  --zinc-855: #18181A !important;
+  --zinc-850: #18181A !important;
+  --zinc-800: #27272A !important;
+  --zinc-750: #3F3F46 !important;
+  --zinc-700: #3F3F46 !important;
+  
+  --color-zinc-955: #000000 !important;
+  --color-zinc-950: #000000 !important;
+  --color-zinc-900: #0B0B0C !important;
+  --color-zinc-855: #18181A !important;
+  --color-zinc-850: #18181A !important;
+  --color-zinc-800: #27272A !important;
+  --color-zinc-750: #3F3F46 !important;
+  --color-zinc-700: #3F3F46 !important;
+
+  /* Muted backgrounds and glow elements slightly reduced */
+  .blur-\[140px\] {
+    opacity: 0.03 !important;
+  }
+  
+  .glass-panel {
+    background: rgba(10, 10, 12, 0.75) !important;
+  }
+
+  .glass-card {
+    background: rgba(15, 15, 18, 0.8) !important;
+  }
+}
+
+/* 2. Pure White Theme Background */
+html.theme-bg-white {
+  --background: #ffffff !important;
+  --foreground: #0f172a !important;
+  
+  --zinc-955: #ffffff !important;
+  --zinc-950: #ffffff !important;
+  --zinc-900: #f8fafc !important;
+  --zinc-855: #f1f5f9 !important;
+  --zinc-850: #e2e8f0 !important;
+  --zinc-800: #cbd5e1 !important;
+  --zinc-750: #94a3b8 !important;
+  --zinc-700: #64748b !important;
+  
+  --zinc-655: #475569 !important;
+  --zinc-650: #475569 !important;
+  --zinc-600: #475569 !important;
+  --zinc-555: #334155 !important;
+  --zinc-550: #334155 !important;
+  --zinc-500: #334155 !important;
+  --zinc-450: #1e293b !important;
+  --zinc-400: #0f172a !important;
+  --zinc-350: #090d16 !important;
+  --zinc-300: #000000 !important;
+  --zinc-250: #000000 !important;
+  --zinc-150: #000000 !important;
+  --zinc-100: #000000 !important;
+  --zinc-50: #000000 !important;
+
+  --color-zinc-955: #ffffff !important;
+  --color-zinc-950: #ffffff !important;
+  --color-zinc-900: #f8fafc !important;
+  --color-zinc-855: #f1f5f9 !important;
+  --color-zinc-850: #e2e8f0 !important;
+  --color-zinc-800: #cbd5e1 !important;
+  --color-zinc-750: #94a3b8 !important;
+  --color-zinc-700: #64748b !important;
+  
+  /* Text overrides for white background */
+  --color-zinc-655: #475569 !important;
+  --color-zinc-650: #475569 !important;
+  --color-zinc-600: #475569 !important;
+  --color-zinc-555: #334155 !important;
+  --color-zinc-550: #334155 !important;
+  --color-zinc-500: #334155 !important;
+  --color-zinc-450: #1e293b !important;
+  --color-zinc-400: #0f172a !important;
+  --color-zinc-350: #090d16 !important;
+  --color-zinc-300: #000000 !important;
+  --color-zinc-250: #000000 !important;
+  --color-zinc-150: #000000 !important;
+  --color-zinc-100: #000000 !important;
+  --color-zinc-50: #000000 !important;
+
+  /* Force standard zinc text classes to render in slate shades on white background */
+  .text-zinc-100 { color: #0f172a !important; }
+  .text-zinc-200 { color: #1e293b !important; }
+  .text-zinc-300 { color: #334155 !important; }
+  .text-zinc-400 { color: #475569 !important; }
+  .text-zinc-500 { color: #64748b !important; }
+  
+  /* Border elements */
+  .border-zinc-900 { border-color: #e2e8f0 !important; }
+  .border-zinc-800 { border-color: #cbd5e1 !important; }
+  .border-zinc-850 { border-color: #cbd5e1 !important; }
+  
+  /* Glass panels and cards */
+  .glass-panel {
+    background: rgba(248, 250, 252, 0.85) !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    color: #0f172a !important;
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(226, 232, 240, 0.6) !important;
+    color: #0f172a !important;
+  }
+
+  /* Table head styles */
+  thead tr {
+    background: #f1f5f9 !important;
+  }
+  
+  /* Input fields, select dropdowns, textareas */
+  input, select, textarea {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+  }
+  
+  /* Coding Arena white textarea constraint */
+  textarea.bg-white {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Background blur decorations */
+  .blur-\[140px\] {
+    opacity: 0.08 !important;
+  }
+
+  /* Custom overlays and tags */
+  .bg-zinc-900\/20 {
+    background-color: rgba(241, 245, 249, 0.5) !important;
+  }
+  .bg-zinc-950\/40 {
+    background-color: rgba(248, 250, 252, 0.6) !important;
+  }
+  .bg-zinc-900\/35 {
+    background-color: rgba(241, 245, 249, 0.4) !important;
+  }
+}
+
 
