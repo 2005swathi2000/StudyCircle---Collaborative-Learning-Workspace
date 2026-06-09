@@ -1449,7 +1449,7 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
                               <textarea
                                 value={editorCode}
                                 onChange={(e) => setEditorCode(e.target.value)}
-                                className="w-full h-full bg-zinc-950 p-4 font-mono text-xs text-zinc-250 leading-relaxed outline-none resize-none focus:ring-1 focus:ring-violet-500/20"
+                                className="w-full h-full bg-white p-4 font-mono text-xs text-black leading-relaxed outline-none resize-none focus:ring-1 focus:ring-violet-500/20"
                                 style={{ tabSize: 4 }}
                                 spellCheck={false}
                               />
