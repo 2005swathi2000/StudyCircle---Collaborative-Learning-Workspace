@@ -22,6 +22,7 @@
 
 /* Dashboard Theme: Emerald & Teal (Green Accent) */
 .theme-dashboard {
+  --accent-violet-955: #022c22;
   --accent-violet-950: #022c22; /* Emerald 950 */
   --accent-violet-900: #064e3b; /* Emerald 900 */
   --accent-violet-600: #10b981; /* Emerald 600 */
@@ -32,12 +33,33 @@
   --accent-indigo-955: #042f2e; /* Teal 950 */
   --accent-indigo-950: #042f2e; /* Teal 950 */
   --accent-indigo-900: #115e59; /* Teal 900 */
+  --accent-indigo-650: #0d9488;
   --accent-indigo-600: #0d9488; /* Teal 600 */
   --accent-indigo-500: #14b8a6; /* Teal 500 */
+
+  /* Direct overrides for Tailwind v4 color mapping resolution */
+  --color-violet-955: #022c22;
+  --color-violet-950: #022c22;
+  --color-violet-900: #064e3b;
+  --color-violet-600: #10b981;
+  --color-violet-500: #059669;
+  --color-violet-400: #34d399;
+  --color-violet-300: #6ee7b7;
+
+  --color-indigo-955: #042f2e;
+  --color-indigo-950: #042f2e;
+  --color-indigo-900: #115e59;
+  --color-indigo-650: #0d9488;
+  --color-indigo-600: #0d9488;
+  --color-indigo-500: #14b8a6;
+  --color-indigo-400: #0d9488;
+  --color-indigo-300: #115e59;
+  --color-indigo-200: #042f2e;
 }
 
 /* Create Study Modal Theme: Amber & Orange */
 .theme-create-modal {
+  --accent-violet-955: #451a03;
   --accent-violet-950: #451a03; /* Amber 950 */
   --accent-violet-900: #78350f; /* Amber 900 */
   --accent-violet-600: #d97706; /* Amber 600 */
@@ -48,27 +70,69 @@
   --accent-indigo-955: #431407; /* Orange 950 */
   --accent-indigo-950: #431407; /* Orange 950 */
   --accent-indigo-900: #7c2d12; /* Orange 900 */
+  --accent-indigo-650: #ea580c;
   --accent-indigo-600: #ea580c; /* Orange 600 */
   --accent-indigo-500: #f97316; /* Orange 500 */
+
+  /* Direct overrides for Tailwind v4 color mapping resolution */
+  --color-violet-955: #451a03;
+  --color-violet-950: #451a03;
+  --color-violet-900: #78350f;
+  --color-violet-600: #d97706;
+  --color-violet-500: #f59e0b;
+  --color-violet-400: #fbbf24;
+  --color-violet-300: #fcd34d;
+
+  --color-indigo-955: #431407;
+  --color-indigo-950: #431407;
+  --color-indigo-900: #7c2d12;
+  --color-indigo-650: #ea580c;
+  --color-indigo-600: #ea580c;
+  --color-indigo-500: #f97316;
+  --color-indigo-400: #ea580c;
+  --color-indigo-300: #7c2d12;
+  --color-indigo-200: #431407;
 }
 
-/* Workspace Theme: Sapphire Blue & Cyan */
+/* Workspace Theme: Rose & Fuchsia */
 .theme-workspace {
-  --accent-violet-950: #091e3a; /* Deep Sapphire */
-  --accent-violet-900: #0f3057; /* Sapphire 900 */
-  --accent-violet-600: #2563eb; /* Electric Blue */
-  --accent-violet-500: #3b82f6;
-  --accent-violet-400: #22d3ee; /* Cyan Accent */
-  --accent-violet-300: #67e8f9;
+  --accent-violet-955: #310a18;
+  --accent-violet-950: #310a18; /* Deep Rose-950 */
+  --accent-violet-900: #4c0519; /* Rose-900 */
+  --accent-violet-600: #e11d48; /* Rose-600 */
+  --accent-violet-500: #f43f5e; /* Rose-500 */
+  --accent-violet-400: #fb7185; /* Rose-400 */
+  --accent-violet-300: #fecdd3; /* Rose-300 */
   
   --accent-indigo-955: #020617;
-  --accent-indigo-950: #091e3a;
-  --accent-indigo-900: #1d4ed8; /* Royal Blue */
-  --accent-indigo-600: #1d4ed8;
-  --accent-indigo-500: #3b82f6;
+  --accent-indigo-950: #2a082c; /* Fuchsia-950 */
+  --accent-indigo-900: #4a044e; /* Fuchsia-900 */
+  --accent-indigo-650: #c084fc; /* Fuchsia-600 */
+  --accent-indigo-600: #c084fc;
+  --accent-indigo-500: #d8b4fe;
+
+  /* Direct overrides for Tailwind v4 color mapping resolution */
+  --color-violet-955: #310a18;
+  --color-violet-950: #310a18;
+  --color-violet-900: #4c0519;
+  --color-violet-600: #e11d48;
+  --color-violet-500: #f43f5e;
+  --color-violet-400: #fb7185;
+  --color-violet-300: #fecdd3;
+
+  --color-indigo-955: #020617;
+  --color-indigo-950: #2a082c;
+  --color-indigo-900: #4a044e;
+  --color-indigo-650: #c084fc;
+  --color-indigo-600: #c084fc;
+  --color-indigo-500: #d8b4fe;
+  --color-indigo-400: #c084fc;
+  --color-indigo-300: #4a044e;
+  --color-indigo-200: #2a082c;
 }
 
-@theme inline {
+
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-outfit), var(--font-inter), sans-serif;
