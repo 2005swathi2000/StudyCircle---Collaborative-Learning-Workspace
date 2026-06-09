@@ -1425,7 +1425,13 @@ export default function GroupWorkspacePage({ params }: { params: Promise<{ id: s
                         {/* Editor Layout */}
                         <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0">
                           {/* Question details */}
-                          <div className="p-4 bg-zinc-950/40 border border-zinc-900 rounded-2xl overflow-y-auto space-y-3.5">
+                          <div 
+                            className="p-4 rounded-2xl overflow-y-auto space-y-3.5"
+                            style={{ 
+                              background: 'linear-gradient(135deg, rgba(29, 78, 216, 0.2) 0%, rgba(251, 113, 133, 0.05) 50%, rgba(249, 115, 22, 0.18) 100%)', 
+                              border: '1px solid rgba(249, 115, 22, 0.25)' 
+                            }}
+                          >
                             <div>
                               <h5 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Problem Description</h5>
                               <p className="text-xs text-zinc-300 whitespace-pre-wrap leading-relaxed mt-2">
